@@ -1,4 +1,4 @@
-# 🏛️ LabRoom — Sistem Pemesanan Ruangan Lab Terpadu
+# 🏛️ LabRoom: Sistem Pemesanan Ruangan Lab Terpadu (WIP)
 
 **LabRoom** adalah aplikasi manajemen laboratorium berbasis web yang dikembangkan untuk menyederhanakan proses reservasi ruangan di **Laboratorium Terpadu Universitas Tanjungpura**. Sistem ini menggabungkan antarmuka **Statistik Flow Chatbot** untuk memudahkan pengguna dalam mengajukan pemesanan secara terstruktur.
 
