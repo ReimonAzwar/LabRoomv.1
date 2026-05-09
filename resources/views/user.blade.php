@@ -6,6 +6,7 @@
 <title>LabRoom — Sistem Pemesanan Ruangan Lab Terpadu | Universitas Tanjungpura</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Source+Sans+3:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/user.css">
+<meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
 <body>
 
@@ -15,7 +16,6 @@
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="width:13px;height:13px"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
     Universitas Tanjungpura — Laboratorium Terpadu Fakultas Teknik
   </span>
-  <span><span class="inst-dot"></span>&nbsp;Sistem Informasi Pemesanan Ruangan v2.0</span>
 </div>
 
 <!-- TOPBAR -->
@@ -30,11 +30,10 @@
     </div>
   </a>
   <div class="topbar-right">
-    <a href="#" class="nav-link">Beranda</a>
-    <div class="topbar-divider"></div>
-    <a href="#" class="nav-link">Jadwal Ruangan</a>
-    <div class="topbar-divider"></div>
-    <a href="#" class="nav-link">Bantuan</a>
+    <a href="/navigasi" class="nav-link btn-nav">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="width:16px;height:16px;margin-right:6px"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+      Navigasi Ruangan
+    </a>
   </div>
 </div>
 
@@ -46,14 +45,8 @@
   </div>
   <div class="hero-line"></div>
   <div class="hero-content">
-    <div class="hero-breadcrumb">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/></svg>
-      Fakultas Teknik / Laboratorium Terpadu / Pemesanan
-    </div>
-    <div class="hero-badge">
-      <span class="hero-badge-dot"></span>
-      Sistem Online Aktif
-    </div>
+
+
     <h1>Pemesanan <span>Ruangan Lab</span><br>Terpadu Online</h1>
     <p>Pesan ruangan laboratorium Universitas Tanjungpura secara online. Sistem kami memeriksa ketersediaan jadwal secara langsung dan real-time.</p>
   </div>
@@ -121,16 +114,12 @@
           <div>
             <div class="fph-title">Formulir Pemesanan Ruangan</div>
             <div class="fph-sub">
-              <span class="fph-sdot"></span>
+
               Asisten LabBot siap membantu Anda
             </div>
           </div>
         </div>
-        <div class="fph-step-indicator">
-          <div class="step-dot active" id="step1"></div>
-          <div class="step-dot" id="step2"></div>
-          <div class="step-dot" id="step3"></div>
-        </div>
+
       </div>
 
       <!-- BOT MESSAGES -->
@@ -147,9 +136,9 @@
     <div class="rc-modal-header">
       <div>
         <div class="rc-modal-title" id="rc-title">Jadwal Ruangan</div>
-        <div class="rc-modal-sub" id="rc-sub">?</div>
+        <div class="rc-modal-sub" id="rc-sub"></div>
       </div>
-      <button onclick="closeRoomCal()" class="rc-close-btn">??? Tutup</button>
+      <button onclick="closeRoomCal()" class="rc-close-btn">✕ Tutup</button>
     </div>
     <div class="rc-nav">
       <button onclick="rcNav(-1)" class="rc-nav-btn">&#8249;</button>
@@ -170,10 +159,21 @@
 
 <!-- FOOTER -->
 <div class="footer">
-  <div class="footer-left">? 2026 <strong>Laboratorium Terpadu</strong> ? Universitas Tanjungpura. Sistem Informasi Pemesanan Ruangan.</div>
+  <div class="footer-left">© 2026 <strong>Laboratorium Terpadu</strong> — Universitas Tanjungpura. Sistem Informasi Pemesanan Ruangan.</div>
   <div class="footer-right">Pontianak, Kalimantan Barat, Indonesia</div>
 </div>
+<!-- JS Parts -->
+<script src="/js/user_parts/utils.js"></script>
+<script src="/js/user_parts/ui_helpers.js"></script>
+<script src="/js/user_parts/sidebar.js"></script>
+<script src="/js/user_parts/calendar_popup.js"></script>
+<script src="/js/user_parts/chatbot.js"></script>
+<script src="/js/user_parts/form_calendar.js"></script>
+<script src="/js/user_parts/form_logic.js"></script>
+<script src="/js/user_parts/timeline.js"></script>
+
 <script src="/js/user.js"></script>
 </body>
 </html>
-
+
+
