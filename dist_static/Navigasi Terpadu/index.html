@@ -1,0 +1,80 @@
+<style>
+  body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background: #f4f4f4;
+  }
+  
+  .container {
+    position: relative;
+    width: 100%;
+    height: 100vh; /* Mengisi seluruh layar */
+    display: flex;
+    flex-direction: column;
+  }
+
+  .canva-frame-container {
+    position: relative;
+    width: 100%;
+    flex: 1; /* Mengisi sisa ruang */
+    overflow: hidden;
+  }
+
+  .canva-embed-item {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    border: none;
+  }
+
+  /* Overlay Transparan tepat di atas teks "PEMINJAMAN LAB" di dalam Canva */
+  .peminjaman-link-overlay {
+    position: absolute;
+    /* Koordinat ini disesuaikan dengan posisi menu di dalam desain Canva Anda */
+    top: 36px;      /* Jarak dari atas ke bar menu Canva */
+    right: 45px;    /* Jarak dari kanan ke teks Peminjaman Lab */
+    width: 130px;   /* Lebar area klik */
+    height: 30px;   /* Tinggi area klik */
+    z-index: 999;
+    cursor: pointer;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    /* Styling agar terlihat seperti link saat di-hover (bergaris) */
+    color: transparent;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+  }
+
+  .peminjaman-link-overlay:hover {
+    border-bottom: 2px solid #0D2244; /* Warna garis bawah menyesuaikan desain */
+  }
+
+  /* Responsive adjustment jika diperlukan */
+  @media (max-width: 768px) {
+    .peminjaman-link-overlay {
+      top: 25px;
+      right: 30px;
+      width: 100px;
+    }
+  }
+</style>
+
+<div class="container">
+  <div class="canva-frame-container">
+    <!-- Link Overlay Transparan -->
+    <a href="https://aakmalm.github.io/Navigasi-Peminjaman-Ruangan-Lab/" class="peminjaman-link-overlay" title="Kembali ke Peminjaman Lab"></a>
+
+    <iframe 
+      class="canva-embed-item"
+      loading="lazy" 
+      src="https://www.canva.com/design/DAHJHEUu0Zo/v00qB_L145CDv3WTsDB8kg/view?embed" 
+      allowfullscreen>
+    </iframe>
+  </div>
+</div>
