@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="csrf-token" content="{{ csrf_token() }}">
 <title>LabRoom — Admin Panel | Universitas Tanjungpura</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Source+Sans+3:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -128,22 +129,22 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle
 .bsec:hover{border-color:var(--gold);color:var(--gold2);background:var(--gold-bg)}
 .bsec svg{width:13px;height:13px}
 /* STATS */
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
-.stat{background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:18px 20px;cursor:pointer;transition:all .2s;box-shadow:var(--shadow);position:relative;overflow:hidden}
-.stat::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:var(--sa,var(--gold));opacity:.5}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px}
+.stat{background:var(--card);border:none;border-bottom:5px solid rgba(200,168,75,.25);border-radius:18px;padding:24px 22px;cursor:pointer;transition:all .3s cubic-bezier(.34,1.56,.64,1);box-shadow:0 12px 36px rgba(200,168,75,.12);position:relative}
 .stat:nth-child(1){animation:fadeUp .35s .05s both}
 .stat:nth-child(2){animation:fadeUp .35s .10s both}
 .stat:nth-child(3){animation:fadeUp .35s .15s both}
 .stat:nth-child(4){animation:fadeUp .35s .20s both}
-.stat:hover{transform:translateY(-3px);box-shadow:var(--shadow2);border-color:var(--border2)}
-.slbl{font-size:11px;color:var(--text3);font-weight:700;margin-bottom:10px;text-transform:uppercase;letter-spacing:.07em}
-.sval{font-size:34px;font-weight:700;color:var(--navy);line-height:1;font-family:var(--display)}
-.sval.amber{color:var(--amber);--sa:var(--amber)}
-.sval.green{color:var(--green);--sa:var(--green)}
-.sval.red{color:var(--red);--sa:var(--red)}
-.ssub{font-size:11.5px;color:var(--text3);margin-top:5px}
-.sico{position:absolute;right:16px;top:50%;transform:translateY(-50%);width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:var(--sib,var(--gold-bg))}
-.sico svg{width:20px;height:20px}
+.stat:hover{transform:translateY(-6px);box-shadow:0 20px 48px rgba(200,168,75,.2);border-bottom-color:var(--gold)}
+.slbl{font-size:11.5px;color:var(--text2);font-weight:700;margin-bottom:14px;text-transform:uppercase;letter-spacing:.08em}
+.sval{font-size:40px;font-weight:700;color:var(--navy);line-height:1;font-family:var(--display)}
+.sval.amber{color:var(--amber)}
+.sval.green{color:var(--green)}
+.sval.red{color:var(--red)}
+.ssub{font-size:12.5px;color:var(--text3);margin-top:8px}
+.sico{position:absolute;right:22px;bottom:22px;width:52px;height:52px;border-radius:16px;display:flex;align-items:center;justify-content:center;background:var(--sib,var(--gold-bg));transition:transform .3s cubic-bezier(.34,1.56,.64,1)}
+.stat:hover .sico{transform:scale(1.1) rotate(5deg)}
+.sico svg{width:24px;height:24px}
 /* SECTION TITLE */
 .stitle{font-size:11.5px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between}
 .stitle-l{display:flex;align-items:center;gap:8px}
@@ -498,6 +499,89 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle
   </div>
 </div>
 
+<div class="ov" id="notif-overlay">
+  <div class="modal" style="max-width:480px">
+    <div class="mhd">
+      <div class="mttl">📱 Kirim Notifikasi WhatsApp</div>
+      <div class="msub" id="notif-sub">—</div>
+    </div>
+    <div class="mf" style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div>
+        <div class="ml">Status Keputusan</div>
+        <div class="mv" id="notif-status-badge">—</div>
+      </div>
+      <div>
+        <div class="ml">Nomor WhatsApp</div>
+        <div class="mv" id="notif-kontak-display" style="font-size:14px;font-weight:700;color:var(--green)">—</div>
+      </div>
+    </div>
+    <div class="mf">
+      <div class="ml">Catatan Tambahan (Opsional)</div>
+      <textarea id="notif-note" class="fci" rows="2" placeholder="Tulis alasan penolakan atau pesan tambahan..." style="resize:vertical" oninput="updateNotifPreview()"></textarea>
+    </div>
+    <div class="mf">
+      <div class="ml">Pratinjau Pesan WA</div>
+      <textarea id="notif-preview" class="fci" rows="6" style="background:var(--cream2);font-size:12px;line-height:1.5;resize:vertical" oninput="void(0)"></textarea>
+      <div style="font-size:10px;color:var(--text3);margin-top:5px">Pesan akan dikirim otomatis via Fonnte atau via link wa.me manual.</div>
+    </div>
+    <div id="notif-result" style="display:none;padding:10px 14px;border-radius:9px;font-size:13px;font-weight:600;margin-bottom:4px"></div>
+    <div class="mac">
+      <button class="mb svc" id="notif-send-btn" style="background:linear-gradient(135deg, var(--green), #15693e);border-color:var(--green);color:white">
+        <svg viewBox="0 0 24 24" fill="currentColor" style="width:16px;height:16px;margin-right:5px"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M11.99 2.007A9.956 9.956 0 002.05 11.96c0 1.76.46 3.484 1.333 5.004L2 22l5.232-1.361A9.952 9.952 0 0011.99 22c5.514 0 9.993-4.479 9.993-9.994 0-2.67-1.04-5.18-2.928-7.069A9.925 9.925 0 0011.99 2.007zm0 18.31a8.264 8.264 0 01-4.21-1.153l-.302-.178-3.105.807.83-3.021-.197-.31a8.275 8.275 0 01-1.27-4.402c0-4.575 3.722-8.297 8.297-8.297a8.245 8.245 0 015.868 2.43 8.247 8.247 0 012.428 5.87c-.002 4.575-3.724 8.254-8.339 8.254z"/></svg>
+        Kirim & Simpan
+      </button>
+      <button class="mb cnc" onclick="closeNotifyModal()">Batal</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL EDIT RESERVASI -->
+<div class="ov" id="edit-overlay">
+  <div class="modal" style="max-width:550px">
+    <div class="mhd">
+      <div class="mttl">✏️ Edit Reservasi</div>
+      <div class="msub">ID Reservasi: <span id="edit-id-lbl">—</span></div>
+    </div>
+    <div class="mf" style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div>
+        <div class="ml">Nama Pemesan</div>
+        <input type="text" id="edit-nama" class="fci">
+      </div>
+      <div>
+        <div class="ml">Instansi/Fakultas</div>
+        <input type="text" id="edit-instansi" class="fci">
+      </div>
+    </div>
+    <div class="mf">
+        <div class="ml">Pilih Ruangan</div>
+        <select id="edit-ruangan" class="fci"></select>
+    </div>
+    <div class="mf" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+      <div>
+        <div class="ml">Tanggal</div>
+        <input type="date" id="edit-tanggal" class="fci">
+      </div>
+      <div>
+        <div class="ml">Jam Mulai</div>
+        <input type="time" id="edit-mulai" class="fci" min="07:00" max="17:00" placeholder="07:00">
+      </div>
+      <div>
+        <div class="ml">Jam Selesai</div>
+        <input type="time" id="edit-selesai" class="fci" min="07:00" max="17:00" placeholder="17:00">
+      </div>
+    </div>
+    <div class="mf">
+      <div class="ml">Keperluan</div>
+      <textarea id="edit-keperluan" class="fci" rows="2"></textarea>
+    </div>
+    <div id="edit-error" style="display:none;padding:10px;background:#FDF0EE;color:#C0392B;border-radius:8px;font-size:12px;margin-bottom:15px;border:1px solid rgba(192,57,43,0.1)"></div>
+    <div class="mac">
+      <button class="mb svc" onclick="saveEdit()" id="edit-save-btn">Simpan Perubahan</button>
+      <button class="mb cnc" onclick="closeEditModal()">Batal</button>
+    </div>
+  </div>
+</div>
+
 <script>
 const USERS=[{id:1,username:'admin',password:'lab2026',nama:'Administrator',role:'admin'},{id:2,username:'superadmin',password:'super@123',nama:'Super Admin',role:'superadmin'},{id:3,username:'labmanager',password:'mgr2026',nama:'Manajer Lab',role:'manager'}];
 const SK='labroom_session';
@@ -590,7 +674,13 @@ function buildRows(data){
     const tl=b.status==='pending'?'Menunggu':b.status==='approved'?'Disetujui':'Ditolak';
     const cf=b.status==='pending'?gc(b.ruangan,b.tanggal,b.jamMulai,b.jamSelesai,b.id):[];
     const cb=cf.length?'<span class="cbg">⚠ Bentrok</span>':'';
-    const ac=b.status==='pending'?`<button class="ab2 vw" onclick="openModal(${b.id})">Tinjau</button><button class="ab2 ar" onclick="qd(${b.id},'rejected')">Tolak</button>`:`<button class="ab2 vw" onclick="openModal(${b.id})">Detail</button>`;
+    const ac=`<div style="display:flex;gap:4px">
+      <button class="ab2 vw" onclick="openModal(${b.id})">${b.status==='pending'?'Tinjau':'Detail'}</button>
+      <button class="ab2 wa" onclick="openNotifyModal(${b.id}, '${b.status}')" style="background:#25D366;color:white;border:none;padding:4px 8px;border-radius:6px;cursor:pointer;display:flex;align-items:center" title="Kirim WA">
+        <svg viewBox="0 0 24 24" fill="currentColor" style="width:14px;height:14px"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M11.99 2.007A9.956 9.956 0 002.05 11.96c0 1.76.46 3.484 1.333 5.004L2 22l5.232-1.361A9.952 9.952 0 0011.99 22c5.514 0 9.993-4.479 9.993-9.994 0-2.67-1.04-5.18-2.928-7.069A9.925 9.925 0 0011.99 2.007zm0 18.31a8.264 8.264 0 01-4.21-1.153l-.302-.178-3.105.807.83-3.021-.197-.31a8.275 8.275 0 01-1.27-4.402c0-4.575 3.722-8.297 8.297-8.297a8.245 8.245 0 015.868 2.43 8.247 8.247 0 012.428 5.87c-.002 4.575-3.724 8.254-8.339 8.254z"/></svg>
+      </button>
+      <button class="ab2 vw" onclick="openEditModal(${b.id})" style="background:var(--navy);color:white;border:none;padding:4px 8px;border-radius:6px;cursor:pointer" title="Edit">✏️</button>
+    </div>`;
     return`<div class="brow"><div class="c"><div class="cn">${b.nama}${cb}</div><div class="cs">${b.kontak}</div></div><div class="c col-inst" style="font-size:12.5px;color:var(--text2)">${b.instansi||'—'}</div><div class="c" style="font-size:12.5px">${b.ruangan}</div><div class="c col-time">${fd(b.tanggal)}<br><span style="color:var(--text3);font-size:11.5px">${b.jamMulai}–${b.jamSelesai}</span></div><div class="c"><span class="tag ${tc}"><span class="tdot"></span>${tl}</span></div><div class="acts">${ac}</div></div>`;
   }).join('');
 }
@@ -708,7 +798,7 @@ function openModal(id){
   const ap=document.getElementById('m-approve');const rj=document.getElementById('m-reject');
   if(b.status==='pending'){
     ap.style.display='';rj.style.display='';
-    ap.onclick=()=>decide(id,'approved');rj.onclick=()=>decide(id,'rejected');
+    ap.onclick=()=>openNotifyModal(id,'approved');rj.onclick=()=>openNotifyModal(id,'rejected');
   } else {
     ap.style.display='none';rj.style.display='none';
   }
@@ -725,6 +815,182 @@ async function decide(id,st){
     closeModal();await renderAdmin();showToast(st==='approved'?'Pemesanan berhasil disetujui!':'Pemesanan ditolak.',st==='approved'?'success':'error');
   } catch(e){}
 }
+
+let editId=null;
+function openEditModal(id){
+  const b=lb().find(x=>x.id===id); if(!b) return;
+  editId=id;
+  document.getElementById('edit-id-lbl').textContent=id;
+  document.getElementById('edit-nama').value=b.nama;
+  document.getElementById('edit-instansi').value=b.instansi;
+  document.getElementById('edit-tanggal').value=b.tanggal;
+  document.getElementById('edit-mulai').value=b.jamMulai;
+  document.getElementById('edit-selesai').value=b.jamSelesai;
+  document.getElementById('edit-keperluan').value=b.keperluan;
+  
+  const rSel=document.getElementById('edit-ruangan');
+  rSel.innerHTML=lr().map(r=>`<option value="${r.name}" ${r.name===b.ruangan?'selected':''}>${r.name}</option>`).join('');
+  
+  document.getElementById('edit-error').style.display='none';
+  document.getElementById('edit-overlay').classList.add('show');
+}
+function closeEditModal(){ document.getElementById('edit-overlay').classList.remove('show'); editId=null; }
+
+async function saveEdit(){
+  const btn=document.getElementById('edit-save-btn');
+  const err=document.getElementById('edit-error');
+  const payload={
+    nama: document.getElementById('edit-nama').value,
+    instansi: document.getElementById('edit-instansi').value,
+    ruangan: document.getElementById('edit-ruangan').value,
+    tanggal: document.getElementById('edit-tanggal').value,
+    jamMulai: document.getElementById('edit-mulai').value,
+    jamSelesai: document.getElementById('edit-selesai').value,
+    keperluan: document.getElementById('edit-keperluan').value
+  };
+
+  // 1. Conflict & Time Range Check
+  const sT = payload.jamMulai;
+  const eT = payload.jamSelesai;
+  if(sT < '07:00' || eT > '17:00' || sT >= eT){
+    err.textContent='⚠️ Gagal: Jam operasional adalah 07:00 - 17:00.';
+    err.style.display='block'; return;
+  }
+
+  const conflicts=gc(payload.ruangan, payload.tanggal, payload.jamMulai, payload.jamSelesai, editId);
+  if(conflicts.length){
+    err.textContent='⚠️ Gagal: Ruangan sudah terisi pada jam tersebut.';
+    err.style.display='block'; return;
+  }
+
+  btn.disabled=true; btn.textContent='Menyimpan...';
+  try {
+    const res=await fetch('/api/bookings/'+editId,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','X-CSRF-TOKEN':document.querySelector('meta[name="csrf-token"]').content},
+      body:JSON.stringify(payload)
+    });
+    if(!res.ok) throw new Error('Gagal update ke server');
+    showToast('Reservasi berhasil diperbarui!','success');
+    await fetchData(); renderAdmin(); closeEditModal();
+  } catch(e){
+    err.textContent='⚠️ Error: '+e.message; err.style.display='block';
+  } finally { btn.disabled=false; btn.textContent='Simpan Perubahan'; }
+}
+
+function openNotifyModal(id, st){
+  notifId=id; notifSt=st;
+  const list=lb(); notifBooking=list.find(x=>x.id===id);
+  if(!notifBooking) return;
+  
+  // Hanya tutup modal detail jika sedang terbuka
+  const detOverlay = document.getElementById('detail-overlay');
+  if(detOverlay && detOverlay.classList.contains('show')) closeModal();
+
+  document.getElementById('notif-sub').textContent='Kepada: '+notifBooking.nama;
+  document.getElementById('notif-kontak-display').innerHTML = '<strong>' + notifBooking.kontak + '</strong>';
+
+  const bdg=document.getElementById('notif-status-badge');
+  if(st==='approved'){
+    bdg.innerHTML='<span style="color:var(--green);font-weight:700;font-size:14px">✓ Disetujui</span>';
+  } else if(st==='rejected'){
+    bdg.innerHTML='<span style="color:var(--red);font-weight:700;font-size:14px">✕ Ditolak</span>';
+  } else {
+    bdg.innerHTML='<span style="color:var(--amber);font-weight:700;font-size:14px">⏳ Menunggu</span>';
+  }
+
+  document.getElementById('notif-note').value='';
+  document.getElementById('notif-result').style.display='none';
+  
+  // RESET BUTTON STATE (Fix loading bug)
+  const sendBtn = document.getElementById('notif-send-btn');
+  sendBtn.disabled = false;
+  sendBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor" style="width:16px;height:16px;margin-right:5px"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M11.99 2.007A9.956 9.956 0 002.05 11.96c0 1.76.46 3.484 1.333 5.004L2 22l5.232-1.361A9.952 9.952 0 0011.99 22c5.514 0 9.993-4.479 9.993-9.994 0-2.67-1.04-5.18-2.928-7.069A9.925 9.925 0 0011.99 2.007zm0 18.31a8.264 8.264 0 01-4.21-1.153l-.302-.178-3.105.807.83-3.021-.197-.31a8.275 8.275 0 01-1.27-4.402c0-4.575 3.722-8.297 8.297-8.297a8.245 8.245 0 015.868 2.43 8.247 8.247 0 012.428 5.87c-.002 4.575-3.724 8.254-8.339 8.254z"/></svg> Kirim & Simpan';
+
+  updateNotifPreview();
+  document.getElementById('notif-send-btn').onclick=()=>sendNotificationAndSave();
+  document.getElementById('notif-overlay').classList.add('show');
+}
+
+function closeNotifyModal(){
+  document.getElementById('notif-overlay').classList.remove('show');
+  notifId=null;notifSt='';notifBooking=null;
+}
+document.getElementById('notif-overlay').addEventListener('click',function(e){if(e.target===this)closeNotifyModal();});
+
+function updateNotifPreview(){
+  if(!notifBooking)return;
+  const note=document.getElementById('notif-note').value.trim();
+  const tgl=new Date(notifBooking.tanggal+'T00:00:00').toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  let msg=`Halo ${notifBooking.nama},\n\n`;
+  msg+=`Pesan resmi dari LabRoom Untan.\n`;
+  msg+=`Reservasi *${notifBooking.ruangan}* pada *${tgl}* pukul ${notifBooking.jamMulai}–${notifBooking.jamSelesai} WIB telah `;
+  if(notifSt==='approved') msg+=`*DISETUJUI* ✅.`;
+  else if(notifSt==='rejected') msg+=`*DITOLAK* ❌.`;
+  else msg+=`*DIPROSES* ⏳.`;
+  if(note) msg+=`\n\nCatatan:\n"${note}"`;
+  msg+=`\n\nTerima kasih.`;
+  document.getElementById('notif-preview').value=msg;
+}
+
+async function sendNotificationAndSave(){
+  const btn=document.getElementById('notif-send-btn');
+  const resultEl=document.getElementById('notif-result');
+  btn.disabled=true;
+  btn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="animation:spin .7s linear infinite;width:14px;height:14px;margin-right:6px"><path d="M21 12a9 9 0 11-6.219-8.56"/></svg> Mengirim...';
+  resultEl.style.display='none';
+
+  const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
+  const headers = {'Content-Type':'application/json','X-CSRF-TOKEN':csrfToken};
+
+  try {
+    // 1. Save booking status
+    const note = document.getElementById('notif-note').value.trim();
+    const statusRes = await fetch('/api/bookings/'+notifId+'/status',{
+      method:'POST', headers, body:JSON.stringify({
+        status: notifSt,
+        alasan_penolakan: note
+      })
+    });
+    if(!statusRes.ok) throw new Error('Gagal menyimpan status reservasi');
+
+    // 2. Send notification (WhatsApp Only)
+    const msg = document.getElementById('notif-preview').value;
+    const kontak = notifBooking.kontak;
+    
+    const notifRes = await fetch('/api/notify/whatsapp',{
+      method:'POST', headers,
+      body: JSON.stringify({phone:kontak, message:msg})
+    });
+    const notifData = await notifRes.json();
+    
+    // Handle fallback link for WhatsApp if API fails
+    if(!notifData.success && notifData.fallback_url){
+        window.open(notifData.fallback_url, '_blank');
+    }
+
+    if(notifData.success || notifData.fallback_url){
+      resultEl.style.cssText='display:block;background:var(--green-bg);color:var(--green);border:1px solid rgba(26,127,75,.25);padding:10px 14px;border-radius:9px;font-size:13px;font-weight:600;margin-bottom:4px';
+      resultEl.textContent=notifData.success ? '✓ WhatsApp Terkirim Otomatis' : '✓ Link WhatsApp Terbuka';
+      await renderAdmin();
+      setTimeout(()=>{
+        closeNotifyModal();
+        showToast(notifSt==='approved'?'Reservasi disetujui & notifikasi terkirim!':'Reservasi ditolak & notifikasi terkirim!', notifSt==='approved'?'success':'error');
+      }, 1800);
+    } else {
+      resultEl.style.cssText='display:block;background:var(--amber-bg);color:var(--amber);border:1px solid rgba(200,134,10,.25);padding:10px 14px;border-radius:9px;font-size:13px;font-weight:600;margin-bottom:4px';
+      resultEl.textContent='⚠ Gagal mengirim WA: '+notifData.message;
+      btn.disabled=false;
+      btn.innerHTML='Kirim & Simpan';
+    }
+  } catch(e){
+    resultEl.style.cssText='display:block;background:var(--red-bg);color:var(--red);border:1px solid rgba(192,57,43,.25);padding:10px 14px;border-radius:9px;font-size:13px;font-weight:600;margin-bottom:4px';
+    resultEl.textContent='✕ Error: '+e.message;
+    btn.disabled=false;
+    btn.innerHTML='Kirim & Simpan';
+  }
+}
+
 async function qd(id,st){
   try {
     await fetch('/api/bookings/'+id+'/status', {

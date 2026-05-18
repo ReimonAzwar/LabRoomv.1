@@ -18,7 +18,8 @@ class Booking extends Model
         'jam_mulai',
         'jam_selesai',
         'keperluan',
-        'status'
+        'status',
+        'alasan_penolakan'
     ];
 
     public function room()
