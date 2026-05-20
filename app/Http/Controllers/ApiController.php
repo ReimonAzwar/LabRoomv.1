@@ -17,6 +17,7 @@ class ApiController extends Controller
             return [
                 'id' => $room->id,
                 'name' => $room->name,
+                'nama_ruang' => $room->nama_ruang,
                 'cap' => $room->cap,
                 'fasilitas' => $room->fasilitas,
                 'status' => $room->status,
@@ -33,7 +34,7 @@ class ApiController extends Controller
             return [
                 'id' => $b->id,
                 'ruangan_id' => $b->room_id,
-                'ruangan' => $b->room ? $b->room->name : 'Unknown',
+                'ruangan' => $b->room ? $b->room->nama_ruang : 'Unknown',
                 'nama' => $b->nama,
                 'instansi' => $b->instansi,
                 'kontak' => $b->kontak,

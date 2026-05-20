@@ -822,8 +822,21 @@ button:active, .nav-link:active, .tpl-chip:active { transform: scale(0.98); }
 
 <script>
 /* ═══════════════════════════════════════
-   CONSTANTS & STORAGE
+   CONSTANTS & STORAGE & SECURITY
 ═══════════════════════════════════════ */
+function escapeHTML(str) {
+    if (!str) return '';
+    return String(str).replace(/[&<>'"]/g, 
+        tag => ({
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            "'": '&#39;',
+            '"': '&quot;'
+        }[tag] || tag)
+    );
+}
+
 let GLOBAL_ROOMS = [];
 let GLOBAL_BOOKINGS = [];
 
@@ -947,7 +960,7 @@ function rcShowDay(ds){
         <span style="font-size:13.5px;font-weight:700;color:var(--navy)">${b.jamMulai} – ${b.jamSelesai}</span>
         <span style="font-size:11px;font-weight:700;${stC[b.status]||'color:var(--text3)'}">${stL[b.status]||b.status}</span>
       </div>
-      <div style="font-size:12.5px;color:var(--text2);margin-top:4px">${b.keperluan}</div>
+      <div style="font-size:12.5px;color:var(--text2);margin-top:4px">${escapeHTML(b.keperluan)}</div>
     </div>`).join('');
   det.style.display='block';
 }
@@ -1296,9 +1309,9 @@ function buildHistoryCard(b, isSearch = false){
           <span class="status-badge ${stC[b.status]}">${stL[b.status]}</span>
         </div>
       </div>
-      <div class="history-room">${b.ruangan}</div>
+      <div class="history-room">${escapeHTML(b.ruangan)}</div>
       <div class="history-time">${fd(b.tanggal)} • ${b.jamMulai} - ${b.jamSelesai}</div>
-      ${isSearch ? `<div style="font-size:11px;color:var(--text3);margin-top:4px">Pemohon: ${b.nama}</div>` : ''}
+      ${isSearch ? `<div style="font-size:11px;color:var(--text3);margin-top:4px">Pemohon: ${escapeHTML(b.nama)}</div>` : ''}
     </div>
   `;
 }
@@ -1477,7 +1490,7 @@ function userCalShowPreview(ds){
   listEl.innerHTML=bks.map(b=>`
     <div style="display:flex;justify-content:space-between;align-items:center;padding:4px 9px;background:var(--white);border:1px solid var(--border);border-radius:6px;margin-bottom:3px;font-size:11.5px">
       <span style="font-weight:700;color:var(--navy)">${b.jamMulai}–${b.jamSelesai}</span>
-      <span style="color:var(--text2);flex:1;padding:0 8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${b.keperluan}</span>
+      <span style="color:var(--text2);flex:1;padding:0 8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escapeHTML(b.keperluan)}</span>
       <span style="font-weight:700;font-size:10.5px;${stC[b.status]||'color:var(--text3)'}">${stL[b.status]||b.status}</span>
     </div>`).join('');
   preview.style.display='block';
@@ -1592,7 +1605,7 @@ function checkConflict(){
   if(!r||!d||!ms||!me)return;if(toMin(ms)>=toMin(me))return;
   const conflicts=getConflicts(r,d,ms,me);
   if(conflicts.length){
-    if(cp){cp.classList.add('show');document.getElementById('conflict-items').innerHTML=conflicts.map(b=>`<div class="conflict-item"><strong>${b.nama}</strong> (${b.instansi||'—'}) — ${b.jamMulai}–${b.jamSelesai}</div>`).join('');}
+    if(cp){cp.classList.add('show');document.getElementById('conflict-items').innerHTML=conflicts.map(b=>`<div class="conflict-item"><strong>${escapeHTML(b.nama)}</strong> (${escapeHTML(b.instansi)||'—'}) — ${b.jamMulai}–${b.jamSelesai}</div>`).join('');}
     const fm=document.getElementById('f-mulai');const fs=document.getElementById('f-selesai');
     if(fm){fm.classList.add('err');fm.classList.remove('ok');}if(fs){fs.classList.add('err');fs.classList.remove('ok');}
   } else {
