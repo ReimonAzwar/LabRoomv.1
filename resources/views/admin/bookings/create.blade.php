@@ -24,7 +24,7 @@
                 </div>
                 
                 <div class="form-group">
-                    <label for="kontak">Kontak (Email / No. HP)</label>
+                    <label for="kontak">Kontak (No. WhatsApp)</label>
                     <input type="text" id="kontak" name="kontak" required value="{{ old('kontak') }}">
                 </div>
 

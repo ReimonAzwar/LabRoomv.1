@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\ApiController;
+use App\Http\Controllers\NotificationController;
 
 Route::get('/', function () {
     return view('user');
@@ -23,4 +24,7 @@ Route::prefix('api')->group(function() {
     Route::post('/bookings/{id}', [ApiController::class, 'updateBooking']);
     Route::post('/bookings/{id}/status', [ApiController::class, 'updateBookingStatus']);
     Route::delete('/bookings/{id}', [ApiController::class, 'deleteBooking']);
+
+    // Notification routes
+    Route::post('/notify/whatsapp', [NotificationController::class, 'sendWhatsApp']);
 });

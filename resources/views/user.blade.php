@@ -1071,9 +1071,9 @@ function injectFormCard(){
             <div class="err-text" id="e-nama"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="width:12px;height:12px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Nama tidak boleh kosong</div>
           </div>
           <div class="fc-field">
-            <label class="fc-label">No. HP / Email <span class="req">*</span></label>
-            <input class="fc-input" id="f-kontak" type="text" placeholder="08xxx / nama@email.com" oninput="vld('f-kontak','e-kontak')"/>
-            <div class="err-text" id="e-kontak"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="width:12px;height:12px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Kontak tidak boleh kosong</div>
+            <label class="fc-label">Nomor WhatsApp <span class="req">*</span></label>
+            <input class="fc-input" id="f-kontak" type="tel" placeholder="contoh: 081234567890" oninput="this.value=this.value.replace(/[^0-9]/g,'');vld('f-kontak','e-kontak')"/>
+            <div class="err-text" id="e-kontak"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="width:12px;height:12px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Nomor WhatsApp tidak boleh kosong</div>
           </div>
         </div>
 
@@ -1333,8 +1333,8 @@ function doSearchHistory(qOverride){
   const found = GLOBAL_BOOKINGS.filter(b => b.id == q || b.kontak.includes(q)).sort((a,b) => b.id - a.id);
   
   if(found.length === 0){
-    if(qOverride) { renderHistory(); return; } // If auto-search failed, show empty history
-    res.innerHTML=`<div style="text-align:center;padding:20px;color:var(--text3);font-size:13px">Data tidak ditemukan. Pastikan ID atau Nomor WA benar.</div>`;
+    if(qOverride) { renderHistory(); return; } 
+    res.innerHTML=`<div style="text-align:center;padding:20px;color:var(--text3);font-size:13px">Data tidak ditemukan. Pastikan ID Reservasi atau Nomor WA benar.</div>`;
     return;
   }
 
@@ -1499,9 +1499,11 @@ function userCalShowPreview(ds){
 
 /* ─── TIME INPUT MASK (24-JAM) ─── */
 function clampTime(h,m){
-  // Jika jam melebihi 23 → 23:59 (maksimum format 24 jam)
-  if(h>23)return{h:23,m:59};
-  // Jika menit melebihi 59 → clamp ke 59
+  // Batasi rentang operasional 07:00 - 17:00
+  if(h < 7) return {h: 7, m: 0};
+  if(h > 17) return {h: 17, m: 0};
+  if(h === 17) return {h: 17, m: 0}; // Maksimal pukul 17:00
+  
   m=Math.max(0,Math.min(59,m));
   return{h,m};
 }
@@ -1618,8 +1620,14 @@ function onTimeChange(){
   const ms=document.getElementById('f-mulai')?.value;const me=document.getElementById('f-selesai')?.value;
   const errEl=document.getElementById('e-time');const sb=document.getElementById('submit-btn');
   let bad=false;
-  if(ms&&me){if(toMin(ms)>=toMin(me)||toMin(ms)<7*60||toMin(me)>17*60)bad=true;}
-  if(errEl)errEl.classList.toggle('show',bad);
+  if(ms&&me){
+    const sMin = toMin(ms), eMin = toMin(me);
+    if(sMin >= eMin || sMin < 7*60 || eMin > 17*60) bad=true;
+  }
+  if(errEl) {
+    errEl.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="width:12px;height:12px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Jam operasional: 07:00 - 17:00 WIB`;
+    errEl.classList.toggle('show',bad);
+  }
   if(sb){if(bad){sb.disabled=true;}else{sb.disabled=false;}}
   checkConflict();renderTimeline();
 }
@@ -1789,7 +1797,7 @@ init();
     <div style="background:var(--cream);padding:14px;border-radius:12px;border:1px dashed var(--border)">
       <div style="font-size:11px;font-weight:700;color:var(--text2);margin-bottom:8px;text-transform:uppercase">Cari Riwayat Lain</div>
       <div style="display:flex;gap:8px">
-        <input class="fc-input" id="check-q" type="text" placeholder="Masukkan ID atau No. WA" style="flex:1;font-size:12.5px" onkeydown="if(event.key==='Enter')doSearchHistory()"/>
+        <input class="fc-input" id="check-q" type="tel" placeholder="Masukkan ID atau No. WA" style="flex:1;font-size:12.5px" oninput="this.value=this.value.replace(/[^0-9]/g,'')" onkeydown="if(event.key==='Enter')doSearchHistory()"/>
         <button class="fc-submit" onclick="doSearchHistory()" style="width:auto;padding:0 15px;height:40px;margin-top:0;font-size:13px">Cari</button>
       </div>
     </div>

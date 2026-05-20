@@ -82,11 +82,20 @@ class ApiController extends Controller
 
     public function updateBookingStatus(Request $request, $id)
     {
-        $request->validate(['status' => 'required|in:approved,rejected,pending']);
+        $request->validate([
+            'status' => 'required|in:approved,rejected,pending',
+            'alasan_penolakan' => 'nullable|string'
+        ]);
         $booking = Booking::findOrFail($id);
         
         $dbStatus = $request->status == 'approved' ? 'disetujui' : ($request->status == 'rejected' ? 'ditolak' : 'pending');
-        $booking->update(['status' => $dbStatus]);
+        
+        $updateData = ['status' => $dbStatus];
+        if ($request->has('alasan_penolakan')) {
+            $updateData['alasan_penolakan'] = $request->alasan_penolakan;
+        }
+
+        $booking->update($updateData);
 
         return response()->json(['success' => true]);
     }
@@ -118,10 +127,18 @@ class ApiController extends Controller
         $booking = Booking::findOrFail($id);
         
         if ($request->has('nama')) $booking->nama = $request->nama;
+        if ($request->has('instansi')) $booking->instansi = $request->instansi;
         if ($request->has('tanggal')) $booking->tanggal = $request->tanggal;
         if ($request->has('jamMulai')) $booking->jam_mulai = $request->jamMulai;
         if ($request->has('jamSelesai')) $booking->jam_selesai = $request->jamSelesai;
         if ($request->has('keperluan')) $booking->keperluan = $request->keperluan;
+        
+        if ($request->has('ruangan')) {
+            $room = Room::where('name', $request->ruangan)->first();
+            if ($room) {
+                $booking->room_id = $room->id;
+            }
+        }
 
         $booking->save();
         return response()->json(['success' => true]);
