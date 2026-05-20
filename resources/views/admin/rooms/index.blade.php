@@ -24,7 +24,7 @@
             @foreach($rooms as $room)
             <tr>
                 <td>{{ $room->id }}</td>
-                <td style="font-weight: 600;">{{ $room->nama_ruang }}</td>
+                <td style="font-weight: 600;">{{ $room->name }}</td>
                 <td>
                     <span class="badge badge-{{ $room->status }}">{{ ucfirst($room->status) }}</span>
                 </td>
@@ -55,8 +55,8 @@
     <form action="{{ route('rooms.store') }}" method="POST">
         @csrf
         <div class="form-group">
-            <label for="nama_ruang">Nama Ruangan</label>
-            <input type="text" id="nama_ruang" name="nama_ruang" required placeholder="Contoh: Lab Komputer 1">
+            <label for="name">Nama Ruangan</label>
+            <input type="text" id="name" name="name" required placeholder="Contoh: Laboratorium Komunikasi dan Multimedia A">
         </div>
         <div class="form-group">
             <label for="status">Status Awal</label>

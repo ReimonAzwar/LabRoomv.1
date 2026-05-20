@@ -1005,7 +1005,7 @@ document.getElementById('overlay').addEventListener('click',function(e){if(e.tar
 
 const DN=['Ahmad Fauzi','Lestari Putri','Roni Wijaya','Hani Safitri','Dodi Kurnia'];
 const DI=['Teknik Sipil — Umum','Manajemen — Untan','Akuntansi — Umum','Hukum — Untan','Kedokteran — Umum'];
-const DRN=['Lab Komputer A','Lab Jaringan','Lab Elektronika','Ruang Seminar','Ruang Rapat'];
+const DRN=['Laboratorium Komunikasi dan Multimedia A','Laboratorium Komunikasi dan Multimedia B','Laboratorium Data Intelligence A','Laboratorium Data Intelligence B','Ruang Diskusi'];
 const TM=[['08:00','10:00'],['10:00','12:00'],['13:00','15:00'],['15:00','17:00']];
 let di=0;
 async function addDemoBooking(){

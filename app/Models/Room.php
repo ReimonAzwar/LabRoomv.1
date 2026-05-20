@@ -21,25 +21,7 @@ class Room extends Model
         $this->attributes['name'] = $value;
     }
 
-    public function getStatusAttribute($value)
-    {
-        $map = [
-            'available' => 'dibuka',
-            'maintenance' => 'maintenance',
-            'closed' => 'ditutup'
-        ];
-        return $map[$value] ?? $value;
-    }
 
-    public function setStatusAttribute($value)
-    {
-        $map = [
-            'dibuka' => 'available',
-            'maintenance' => 'maintenance',
-            'ditutup' => 'closed'
-        ];
-        $this->attributes['status'] = $map[$value] ?? $value;
-    }
 
     public function bookings()
     {

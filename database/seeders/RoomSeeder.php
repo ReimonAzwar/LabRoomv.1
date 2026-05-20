@@ -14,9 +14,11 @@ class RoomSeeder extends Seeder
     public function run(): void
     {
         $rooms = [
-            ['name' => 'Lab Terpadu 1', 'cap' => 40, 'fasilitas' => '40 PC, Proyektor, AC, WiFi, Whiteboard', 'status' => 'available'],
-            ['name' => 'Lab Terpadu 2', 'cap' => 40, 'fasilitas' => '40 PC, Proyektor, AC, WiFi, Whiteboard', 'status' => 'available'],
-            ['name' => 'Lab Terpadu 3', 'cap' => 40, 'fasilitas' => '40 PC, Proyektor, AC, WiFi, Whiteboard', 'status' => 'available'],
+            ['name' => 'Laboratorium Komunikasi dan Multimedia A', 'cap' => 40, 'fasilitas' => 'PC, AC, Proyektor, WiFi', 'status' => 'available'],
+            ['name' => 'Laboratorium Komunikasi dan Multimedia B', 'cap' => 40, 'fasilitas' => 'PC, AC, Proyektor, WiFi', 'status' => 'available'],
+            ['name' => 'Laboratorium Data Intelligence A', 'cap' => 40, 'fasilitas' => 'PC, AC, Proyektor, WiFi', 'status' => 'available'],
+            ['name' => 'Laboratorium Data Intelligence B', 'cap' => 40, 'fasilitas' => 'PC, AC, Proyektor, WiFi', 'status' => 'available'],
+            ['name' => 'Ruang Diskusi', 'cap' => 20, 'fasilitas' => 'AC, Meja Diskusi, WiFi', 'status' => 'available'],
         ];
 
         foreach ($rooms as $room) {
