@@ -256,7 +256,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle
   position: relative;
   z-index: 1;
   background: #071426;
-  border-top: 3px solid var(--gold);
+  border-top: 1.5px solid rgba(200, 168, 75, 0.35);
   padding: 18px 24px;
   display: flex;
   align-items: center;
@@ -265,17 +265,17 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle
 }
 .afoot-content {
   text-align: center;
-  font-size: 13px;
-  color: var(--gold);
-  font-weight: 500;
-  letter-spacing: 0.02em;
+  font-size: 12px;
+  color: rgba(200, 168, 75, 0.45);
+  font-weight: 400;
+  letter-spacing: 0.04em;
 }
 .scroll-to-top {
   position: absolute;
   right: 24px;
-  background: rgba(200, 168, 75, 0.15);
-  border: 1.5px solid rgba(200, 168, 75, 0.35);
-  color: var(--gold3);
+  background: rgba(200, 168, 75, 0.08);
+  border: 1px solid rgba(200, 168, 75, 0.25);
+  color: rgba(200, 168, 75, 0.55);
   width: 32px;
   height: 32px;
   border-radius: 50%;
