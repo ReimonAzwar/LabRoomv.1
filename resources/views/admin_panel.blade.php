@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="csrf-token" content="{{ csrf_token() }}">
-<title>LabRoom — Admin Panel | Universitas Tanjungpura</title>
+<title>Sisiru — Admin Panel | Universitas Tanjungpura</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Source+Sans+3:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="{{ asset('css/admin/style.css') }}?v=1779328944">
+<link rel="stylesheet" href="{{ asset('css/admin/style.css') }}?v=1779328999">
 </head>
 <body>
 
@@ -20,11 +20,11 @@
       </div>
       <div class="llogo">
         <div class="lem">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="3"/><path d="M8 21h8M12 17v4"/></svg>
+          <img src="/images/logo_untan.png" alt="Untan" style="width:100%;height:100%;object-fit:contain">
         </div>
-        <div class="ltxt">Lab<span>Room</span></div>
+        <div class="ltxt">Sisi<span>ru</span></div>
       </div>
-      <div class="lsub">Portal Admin — Sistem Pemesanan Ruangan Lab Terpadu</div>
+      <div class="lsub">Portal Admin — Sistem Reservasi Ruangan Lab Terpadu</div>
       <div class="ldiv"></div>
       <div class="lf">
         <label class="llbl">Username</label>
@@ -63,9 +63,9 @@
 
   <div class="topbar">
     <div class="logo">
-      <div class="lem2"><svg viewBox="0 0 24 24" fill="none" stroke="var(--navy)" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="3"/><path d="M8 21h8M12 17v4"/></svg></div>
+      <div class="lem2"><img src="/images/logo_untan.png" alt="Untan" style="width:100%;height:100%;object-fit:contain"></div>
       <div class="ltxts">
-        <div class="lmain">Lab<span>Room</span></div>
+        <div class="lmain">Sisi<span>ru</span></div>
         <div class="abadge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>Admin Panel</div>
       </div>
     </div>
@@ -159,13 +159,13 @@
   </div>
 
   <div class="afoot">
-    <span>© 2026 <strong style="color:rgba(200,168,75,.65)">LabRoom Admin</strong> — Universitas Tanjungpura</span>
-    <span>Sistem Informasi Pemesanan Ruangan Lab Terpadu v2.0</span>
+    <span>© 2026 <strong style="color:rgba(200,168,75,.65)">Sisiru Admin</strong> — Universitas Tanjungpura</span>
+    <span>Sistem Informasi Reservasi Ruangan Lab Terpadu v2.0</span>
   </div>
 </div>
 
 <!-- MODALS -->
 @include('admin.modals')
-<script src="{{ asset('js/admin/script.js') }}?v=1779328944"></script>
+<script src="{{ asset('js/admin/script.js') }}?v=1779328999"></script>
 </body>
 </html>

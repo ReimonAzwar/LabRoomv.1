@@ -3,9 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LabRoom — Sistem Pemesanan Ruangan Lab Terpadu | Universitas Tanjungpura</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Source+Sans+3:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="{{ asset('css/user/style.css') }}?v=1779328846">
+<title>Sisiru — Sistem Reservasi Ruangan Lab Terpadu | Universitas Tanjungpura</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600;700&family=Source+Sans+3:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ asset('css/user/style.css') }}?v=1779328899">
 </head>
 <body>
 
@@ -13,6 +14,7 @@
 @include('user.inst_bar')
 <!-- TOPBAR -->
 @include('user.topbar')
+
 <!-- HERO -->
 @include('user.hero')
 <!-- MAIN -->
@@ -56,10 +58,10 @@
     <div class="notice-card anim-ready">
       <div class="notice-title">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 17H2a3 3 0 004-3V9a7 7 0 0114 0v5a3 3 0 004 3zM13.73 21a2 2 0 01-3.46 0"/></svg>
-        Ketentuan Pemesanan
+        Ketentuan Reservasi
       </div>
       <div class="notice-item">Pengajuan minimal H-1 sebelum pemakaian</div>
-      <div class="notice-item">Pemesanan berlaku setelah dikonfirmasi admin</div>
+      <div class="notice-item">Reservasi berlaku setelah dikonfirmasi admin</div>
       <div class="notice-item">Pembatalan harap melapor sebelum H-1</div>
       <div class="notice-item">Ruangan harus ditinggalkan dalam kondisi bersih</div>
     </div>
@@ -72,13 +74,13 @@
       <div class="form-panel-header">
         <div class="fph-left">
           <div class="fph-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="3"/><path d="M8 21h8M12 17v4"/></svg>
+            <img src="/images/logo_untan.png" alt="Untan" style="width:100%;height:100%;object-fit:contain">
           </div>
           <div>
-            <div class="fph-title">Formulir Pemesanan Ruangan</div>
+            <div class="fph-title">Formulir Reservasi Ruangan</div>
             <div class="fph-sub">
               <span class="fph-sdot"></span>
-              Asisten LabBot siap membantu Anda
+              Silakan mengisi formulir reservasi ruangan
             </div>
           </div>
         </div>
@@ -126,7 +128,7 @@
 
 <!-- FOOTER -->
 @include('user.footer')
-<script src="{{ asset('js/user/script.js') }}?v=1779328846"></script>
+<script src="{{ asset('js/user/script.js') }}?v=1779328899"></script>
 
 <div class="rc-overlay" id="status-overlay">
   <div class="rc-modal" style="max-width:440px">

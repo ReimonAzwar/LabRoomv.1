@@ -926,6 +926,7 @@ function showToast(msg,type='success'){
   document.body.appendChild(t);setTimeout(()=>{t.style.opacity='0';t.style.transform='translateY(8px)';t.style.transition='all .3s';setTimeout(()=>t.remove(),300);},3000);
 }
 
+
 /* ─── SCROLL ANIMATION OBSERVER ─── */
 const observer=new IntersectionObserver(entries=>{
   entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');observer.unobserve(e.target);}});
@@ -944,7 +945,7 @@ async function init(){
   renderSidebar();
 
   await showTyping();
-  addBotMsg(`Selamat datang di <strong>Sistem Pemesanan Ruangan Laboratorium Terpadu</strong> Universitas Tanjungpura. 👋<br>Saya adalah <strong>LabBot</strong>, asisten pemesanan digital Anda.`);
+  addBotMsg(`Selamat datang di <strong>Sistem Reservasi Ruangan Laboratorium Terpadu</strong> Universitas Tanjungpura. 👋<br>Silakan lengkapi formulir di bawah ini, kami akan membantu Anda dengan reservasi.`);
   await showTyping();
   addBotMsg(`Silakan lengkapi formulir di bawah ini. Sistem akan memeriksa ketersediaan jadwal secara <strong>real-time</strong> dan otomatis mendeteksi konflik jadwal.`);
   await showTyping();

@@ -1,7 +1,19 @@
 <div class="inst-bar">
-  <span>
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="width:13px;height:13px"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
-    Universitas Tanjungpura — Laboratorium Terpadu Fakultas Teknik
-  </span>
-  <span><span class="inst-dot"></span>&nbsp;Sistem Informasi Pemesanan Ruangan v2.0</span>
+  <div class="inst-bar-left">
+    <span>
+      <i class="fa-solid fa-phone" style="font-size:11px;color:var(--gold)"></i>
+      &nbsp;+62 857-1824-3174
+    </span>
+    <span style="margin-left: 20px;">
+      <i class="fa-solid fa-envelope" style="font-size:11px;color:var(--gold)"></i>
+      &nbsp;info@untan.ac.id
+    </span>
+  </div>
+  <div class="inst-bar-right">
+    <a href="#" class="inst-social-link"><i class="fa-brands fa-facebook-f"></i></a>
+    <a href="#" class="inst-social-link"><i class="fa-brands fa-twitter"></i></a>
+    <a href="#" class="inst-social-link"><i class="fa-brands fa-linkedin-in"></i></a>
+    <a href="#" class="inst-social-link"><i class="fa-brands fa-youtube"></i></a>
+    <a href="#" class="inst-social-link"><i class="fa-brands fa-instagram"></i></a>
+  </div>
 </div>
