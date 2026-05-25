@@ -43,8 +43,17 @@ function doLogout(){cs();document.getElementById('admin-page').classList.remove(
 
 let cur='dashboard',clf='all',cdf='all',dsq='',lsq='';
 function navTo(sec,btn){
-  document.querySelectorAll('.asi').forEach(b=>b.classList.remove('active'));btn.classList.add('active');cur=sec;
+  document.querySelectorAll('.asi').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  cur=sec;
   document.querySelectorAll('.psec').forEach(s=>s.classList.remove('active'));
+  
+  if(sec==='manage-admins') {
+    const secAdm = document.getElementById('sec-manage-admins');
+    if(secAdm) secAdm.classList.add('active');
+    return;
+  }
+  
   if(sec==='dashboard'){document.getElementById('sec-dashboard').classList.add('active');}
   else{
     document.getElementById('sec-list').classList.add('active');
@@ -447,4 +456,223 @@ async function addDemoBooking(){
 function showToast(msg,type='success'){const ic={success:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>',error:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',warn:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>'};const t=document.createElement('div');t.className='toast '+type;t.innerHTML=(ic[type]||ic.success)+msg;document.body.appendChild(t);setTimeout(()=>{t.style.opacity='0';t.style.transform='translateY(8px)';t.style.transition='all .3s';setTimeout(()=>t.remove(),300);},3200);}
 
 const sty=document.createElement('style');sty.textContent='@keyframes spin{to{transform:rotate(360deg)}}';document.head.appendChild(sty);
+
+/* ── State Super Admin ───────────────────────────────────────────── */
+let _admins = [];
+let _adminSearchQ = '';
+
+document.addEventListener('DOMContentLoaded', () => {
+  if (!window.LABROOM_ADMIN?.isSuperAdmin) return;
+  fetchAdminList();
+});
+
+async function fetchAdminList() {
+  try {
+    const res = await fetch('/api/admin/accounts', {
+      headers: {
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+        'Accept': 'application/json',
+      },
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    _admins = data.admins ?? [];
+    renderAdminGrid(_admins);
+    updateAdminBadge(_admins.length);
+  } catch (e) {
+    console.error('[LabRoom] fetchAdminList gagal:', e);
+    showAdminGridError('Gagal memuat daftar admin. Coba segarkan halaman.');
+  }
+}
+
+function renderAdminGrid(admins) {
+  const grid  = document.getElementById('admin-grid');
+  const empty = document.getElementById('admin-grid-empty');
+  const count = document.getElementById('admin-count');
+  if(!grid) return;
+
+  grid.querySelectorAll('.kadmin-card').forEach(el => el.remove());
+
+  const q = _adminSearchQ.toLowerCase();
+  const filtered = q
+    ? admins.filter(a =>
+        (a.name     ?? '').toLowerCase().includes(q) ||
+        (a.username ?? '').toLowerCase().includes(q)
+      )
+    : admins;
+
+  if (count) count.textContent = filtered.length;
+  if (empty) empty.style.display = filtered.length ? 'none' : 'block';
+
+  filtered.forEach(admin => {
+    const card = buildAdminCard(admin);
+    grid.appendChild(card);
+  });
+}
+
+function buildAdminCard(admin) {
+  const card = document.createElement('div');
+  card.className = 'kadmin-card';
+  card.dataset.id = admin.id;
+
+  const initials = (admin.name ?? admin.username ?? '?')
+    .split(' ').slice(0, 2).map(w => w[0]?.toUpperCase() ?? '').join('');
+
+  const isSelf = admin.username === window.LABROOM_ADMIN?.username;
+
+  card.innerHTML = `
+    <div class="kadmin-avatar">${initials}</div>
+    <div class="kadmin-info">
+      <div class="kadmin-name">${escHtml(admin.name ?? admin.username)}</div>
+      <div class="kadmin-username">@${escHtml(admin.username)}</div>
+    </div>
+    <div class="kadmin-actions">
+      <button
+        class="bsm"
+        onclick="openEditAdminModal(${admin.id})"
+        title="Edit admin"
+        ${isSelf ? 'style="opacity:.4;pointer-events:none"' : ''}
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+          <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+        </svg>
+        Edit
+      </button>
+      <button
+        class="bsm danger"
+        onclick="confirmDeleteAdmin(${admin.id}, '${escAttr(admin.name ?? admin.username)}')"
+        title="Hapus admin"
+        ${isSelf ? 'style="opacity:.4;pointer-events:none"' : ''}
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <polyline points="3 6 5 6 21 6"/>
+          <path d="M19 6l-1 14H6L5 6"/>
+          <path d="M10 11v6M14 11v6"/>
+          <path d="M9 6V4h6v2"/>
+        </svg>
+        Hapus
+      </button>
+    </div>
+  `;
+  return card;
+}
+
+function filterAdminList(q) {
+  _adminSearchQ = q;
+  renderAdminGrid(_admins);
+}
+
+function refreshAdmins(btn) {
+  if (btn) {
+    btn.disabled = true;
+    setTimeout(() => { btn.disabled = false; }, 1500);
+  }
+  fetchAdminList();
+}
+
+function updateAdminBadge(n) {
+  const badge = document.getElementById('a-admins');
+  if (badge) badge.textContent = n;
+}
+
+function openAddAdminModal() {
+  const name = window.prompt('Nama lengkap admin baru:');
+  if (!name) return;
+  const username = window.prompt('Username:');
+  if (!username) return;
+  const password = window.prompt('Password sementara:');
+  if (!password) return;
+  createAdminAccount({ name, username, password });
+}
+
+function openEditAdminModal(id) {
+  const admin = _admins.find(a => a.id === id);
+  if (!admin) return;
+  const newName = window.prompt('Nama baru:', admin.name ?? '');
+  if (newName === null) return;
+  const newPassword = window.prompt('Password baru (kosongkan jika tidak diganti):', '');
+  updateAdminAccount(id, {
+    name: newName,
+    ...(newPassword ? { password: newPassword } : {}),
+  });
+}
+
+function confirmDeleteAdmin(id, displayName) {
+  const ok = window.confirm(
+    `Hapus akun admin "${displayName}"?\n\nTindakan ini tidak dapat dibatalkan.`
+  );
+  if (ok) deleteAdminAccount(id);
+}
+
+async function createAdminAccount(payload) {
+  try {
+    const res = await fetch('/api/admin/accounts', {
+      method: 'POST',
+      headers: jsonHeaders(),
+      body: JSON.stringify(payload),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message ?? 'Gagal membuat akun');
+    showToast('Akun admin berhasil dibuat.', 'success');
+    fetchAdminList();
+  } catch (e) {
+    showToast(e.message, 'error');
+  }
+}
+
+async function updateAdminAccount(id, payload) {
+  try {
+    const res = await fetch(`/api/admin/accounts/${id}`, {
+      method: 'PUT',
+      headers: jsonHeaders(),
+      body: JSON.stringify(payload),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message ?? 'Gagal memperbarui akun');
+    showToast('Akun admin berhasil diperbarui.', 'success');
+    fetchAdminList();
+  } catch (e) {
+    showToast(e.message, 'error');
+  }
+}
+
+async function deleteAdminAccount(id) {
+  try {
+    const res = await fetch(`/api/admin/accounts/${id}`, {
+      method: 'DELETE',
+      headers: jsonHeaders(),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message ?? 'Gagal menghapus akun');
+    showToast('Akun admin berhasil dihapus.', 'success');
+    fetchAdminList();
+  } catch (e) {
+    showToast(e.message, 'error');
+  }
+}
+
+function jsonHeaders() {
+  return {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+  };
+}
+
+function escHtml(str) {
+  return String(str)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function escAttr(str) {
+  return String(str).replace(/'/g,"\\'");
+}
+
+function showAdminGridError(msg) {
+  const empty = document.getElementById('admin-grid-empty');
+  if (empty) { empty.textContent = msg; empty.style.display = 'block'; }
+}
+
 (async function(){const s=gs();if(s){document.getElementById('login-page').classList.add('hidden');document.getElementById('admin-page').classList.add('active');document.getElementById('logged-user').textContent=s.nama;await renderAdmin();}})();
