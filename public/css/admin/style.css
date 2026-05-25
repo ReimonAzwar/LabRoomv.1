@@ -254,3 +254,72 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle
 /* FOOTER */
 .afoot{background:var(--navy2);border-top:2px solid var(--gold);padding:12px 24px;font-size:11.5px;color:rgba(200,168,75,.45);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
 @media(max-width:900px){.aside{display:none}.stats{grid-template-columns:repeat(2,1fr)}.thd,.brow{grid-template-columns:1.2fr 1fr .8fr 130px}.col-inst{display:none}}
+
+/* ── Role badge ────────────────────────────────────────────────────── */
+.role-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 20px;
+  line-height: 1.6;
+}
+.role-badge.super {
+  background: linear-gradient(135deg,#c8a84b22,#c8a84b44);
+  color: #c8a84b;
+  border: 1px solid #c8a84b55;
+}
+.role-badge.admin {
+  background: rgba(100,130,200,.12);
+  color: #8faad4;
+  border: 1px solid rgba(100,130,200,.25);
+}
+
+/* ── Super-only items hidden by default, JS reveals when needed ─────── */
+[data-super-only] { display: none !important; }
+body[data-role="super_admin"] [data-super-only] { display: flex !important; }
+/* Sidebar items specifically */
+body[data-role="super_admin"] .asi[data-super-only] { display: flex !important; }
+body[data-role="super_admin"] .adiv[data-super-only] { display: block !important; }
+body[data-role="super_admin"] .asl[data-super-only] { display: block !important; }
+
+/* ── Kelola Admin section ──────────────────────────────────────────── */
+.kadmin-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px;
+  margin-top: 4px;
+}
+.kadmin-card {
+  background: var(--card, #fff);
+  border: 1px solid var(--border, #e5e7eb);
+  border-radius: 10px;
+  padding: 16px 18px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  transition: box-shadow .18s, border-color .18s;
+}
+.kadmin-card:hover { box-shadow: 0 4px 18px rgba(0,0,0,.07); border-color: var(--gold2,#c8a84b); }
+.kadmin-avatar {
+  width: 42px; height: 42px; border-radius: 50%;
+  background: linear-gradient(135deg,#1a2a4a,#2e4270);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  color: #c8a84b; font-size: 17px; font-weight: 700;
+}
+.kadmin-info { flex: 1; min-width: 0; }
+.kadmin-name { font-weight: 600; font-size: 14px; color: var(--navy,#1a2a4a); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.kadmin-username { font-size: 11.5px; color: #8fa0bc; margin-top: 1px; }
+.kadmin-actions { display: flex; gap: 6px; flex-shrink: 0; }
+
+/* ── Kelola Admin modal helpers ────────────────────────────────────── */
+.kadmin-empty {
+  text-align: center; padding: 48px 24px;
+  color: #8fa0bc; font-size: 14px;
+}
+.kadmin-empty svg { display: block; margin: 0 auto 12px; opacity: .35; }
