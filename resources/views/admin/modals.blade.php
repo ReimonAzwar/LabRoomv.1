@@ -2,7 +2,37 @@
   <div class="modal" style="max-width:520px">
     <div class="mhd"><div class="mttl" id="rmgmt-title">Kelola Ruangan</div><div class="msub" id="rmgmt-sub">Edit fasilitas dan status</div></div>
     <div class="mf"><div class="ml">Kapasitas (Orang)</div><input id="rmgmt-cap" type="number" min="1" max="200" class="fci"/></div>
-    <div class="mf"><div class="ml">Fasilitas</div><textarea id="rmgmt-fasilitas" rows="3" placeholder="contoh: 30 PC, Proyektor, AC, WiFi" class="fci" style="resize:vertical"></textarea></div>
+    <div class="mf">
+      <div class="ml">Fasilitas Ruangan</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;padding:8px 0">
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text);cursor:pointer">
+          <input type="checkbox" id="fac-ac" style="accent-color:var(--gold);width:15px;height:15px"/> AC (Air Conditioner)
+        </label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text);cursor:pointer">
+          <input type="checkbox" id="fac-proyektor" style="accent-color:var(--gold);width:15px;height:15px"/> Proyektor / LCD
+        </label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text);cursor:pointer">
+          <input type="checkbox" id="fac-wifi" style="accent-color:var(--gold);width:15px;height:15px"/> Internet / WiFi
+        </label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text);cursor:pointer">
+          <input type="checkbox" id="fac-board" style="accent-color:var(--gold);width:15px;height:15px"/> Papan Tulis / Board
+        </label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text);cursor:pointer">
+          <input type="checkbox" id="fac-sound" style="accent-color:var(--gold);width:15px;height:15px"/> Sound System
+        </label>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;padding-top:4px;border-top:1px dashed rgba(200,168,75,.15)">
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text);cursor:pointer;flex-shrink:0">
+          <input type="checkbox" id="fac-pc-chk" style="accent-color:var(--gold);width:15px;height:15px" onchange="document.getElementById('fac-pc-qty').disabled=!this.checked; if(!this.checked)document.getElementById('fac-pc-qty').value='';"/> Komputer / PC:
+        </label>
+        <input type="number" id="fac-pc-qty" min="1" max="100" class="fci" style="width:75px;padding:4px 8px;font-size:12.5px;height:28px;margin:0" placeholder="0" disabled/>
+        <span style="font-size:12.5px;color:var(--text3)">Unit</span>
+      </div>
+      <div style="margin-top:8px;padding-top:8px;border-top:1px dashed rgba(200,168,75,.15)">
+        <div class="ml" style="font-size:11px;color:var(--text2);margin-bottom:4px;text-transform:none;letter-spacing:normal">Fasilitas Lainnya (Kustom)</div>
+        <input type="text" id="rmgmt-fasilitas" placeholder="contoh: 2 Speaker Portable, Ruang Kedap Suara" class="fci" style="padding:8px 12px;font-size:13px"/>
+      </div>
+    </div>
     <div class="mf"><div class="ml">Status Ruangan</div>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
         <button class="stp available" onclick="pickStatus('available')">✔ Tersedia</button>

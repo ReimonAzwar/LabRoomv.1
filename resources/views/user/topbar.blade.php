@@ -12,6 +12,7 @@
     <a href="/" class="nav-link">Beranda</a>
     <div class="topbar-divider"></div>
     <a href="#reservation-section" class="nav-link">Reservasi Ruangan</a>
+<a href="{{ url('/building-profile') }}" class="nav-link">Profil Gedung</a>
     <div class="topbar-divider"></div>
     <button onclick="openStatusModal()" class="nav-link nav-link-history">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="width:14px;height:14px"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>

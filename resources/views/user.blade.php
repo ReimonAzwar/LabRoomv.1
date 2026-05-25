@@ -157,5 +157,91 @@
   </div>
 </div>
 
+<!-- BOOKING DETAIL POPUP -->
+<div class="rc-overlay" id="booking-detail-overlay">
+  <div class="rc-modal booking-detail-modal" style="max-width:480px">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px">
+      <div>
+        <div class="rc-modal-title" style="display:flex;align-items:center;gap:10px">
+          <span>Detail Pemesanan</span>
+          <span id="det-status-badge" class="status-badge pending">Pending</span>
+        </div>
+        <div class="rc-modal-sub" id="det-id-sub">Nomor Permohonan: #—</div>
+      </div>
+      <button onclick="closeBookingDetailModal()" class="rc-close-btn" style="padding:4px 10px;min-height:auto">✕</button>
+    </div>
+
+    <!-- Booking Info Card -->
+    <div class="detail-info-card">
+      <div class="det-section-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="width:14px;height:14px"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Informasi Ruangan & Waktu
+      </div>
+      <div class="det-row">
+        <span class="det-label">Ruangan</span>
+        <span class="det-val font-display" id="det-ruangan" style="font-weight:700;color:var(--navy);font-size:14px">—</span>
+      </div>
+      <div class="det-row">
+        <span class="det-label">Waktu Pemakaian</span>
+        <span class="det-val" id="det-waktu" style="font-weight:600;color:var(--text)">—</span>
+      </div>
+    </div>
+
+    <!-- Applicant Info -->
+    <div class="detail-info-card">
+      <div class="det-section-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="width:14px;height:14px"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Data Pemohon
+      </div>
+      <div class="det-row">
+        <span class="det-label">Nama Lengkap</span>
+        <span class="det-val" id="det-nama">—</span>
+      </div>
+      <div class="det-row">
+        <span class="det-label">Instansi / Fakultas</span>
+        <span class="det-val" id="det-instansi">—</span>
+      </div>
+      <div class="det-row">
+        <span class="det-label">Nomor WhatsApp</span>
+        <span class="det-val" id="det-kontak" style="font-weight:600">—</span>
+      </div>
+    </div>
+
+    <!-- Purpose -->
+    <div class="detail-info-card">
+      <div class="det-section-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="width:14px;height:14px"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        Keperluan Kegiatan
+      </div>
+      <div class="det-purpose-text" id="det-keperluan">—</div>
+    </div>
+
+    <!-- Rejection Reason Block -->
+    <div id="det-reject-reason-block" class="det-reason-card" style="display:none">
+      <div class="det-reason-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="width:14px;height:14px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        Catatan Penolakan Admin
+      </div>
+      <div class="det-reason-text" id="det-reject-reason">—</div>
+    </div>
+
+    <!-- Visual Timeline Map -->
+    <div class="det-tl-container" id="det-timeline-wrap">
+      <div class="det-tl-header" style="font-size:11.5px;font-weight:600;color:var(--text2);margin-bottom:8px">
+        Visualisasi Jadwal pada Hari Tersebut:
+      </div>
+      <div class="tl-bar" id="det-tl-bar" style="margin-bottom:6px"></div>
+      <div class="tl-ticks"><span>07:00</span><span>09:00</span><span>11:00</span><span>13:00</span><span>15:00</span><span>17:00</span></div>
+      <div class="tl-legend" style="margin-top:6px;gap:10px">
+        <div class="tl-legend-item"><div class="tl-legend-dot" style="background:rgba(192,57,43,.3);width:8px;height:8px"></div>Terpesan</div>
+        <div class="tl-legend-item"><div class="tl-legend-dot" style="background:rgba(26,127,75,.3);width:8px;height:8px"></div>Pemesanan Ini</div>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="det-actions" id="det-actions"></div>
+  </div>
+</div>
+
 </body>
 </html>

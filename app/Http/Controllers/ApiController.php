@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use App\Models\Room;
 use App\Models\Booking;
 use Carbon\Carbon;
@@ -43,6 +44,7 @@ class ApiController extends Controller
                 'jamSelesai' => substr($b->jam_selesai, 0, 5),
                 'keperluan' => $b->keperluan,
                 'status' => $b->status == 'disetujui' ? 'approved' : ($b->status == 'ditolak' ? 'rejected' : 'pending'),
+                'alasan_penolakan' => $b->alasan_penolakan,
                 'createdAt' => $b->created_at->toIso8601String()
             ];
         });

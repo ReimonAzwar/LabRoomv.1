@@ -477,17 +477,25 @@ function buildHistoryCard(b, isSearch = false){
   const myIDs = JSON.parse(localStorage.getItem('labroom_my_bookings') || '[]');
   const isSaved = myIDs.includes(b.id);
 
+  // Status icon
+  const stIcon = {
+    pending: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="width:11px;height:11px"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`,
+    approved: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="width:11px;height:11px"><polyline points="20 6 9 17 4 12"/></svg>`,
+    rejected: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="width:11px;height:11px"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`
+  };
+
   return `
-    <div class="history-item" ${isSearch ? 'style="border-left-color:var(--text3)"' : ''}>
+    <div class="history-item" ${isSearch ? 'style="border-left-color:var(--text3)"' : ''}
+      onclick="openBookingDetail(${b.id})" title="Klik untuk detail">
       <div class="history-header">
         <span class="history-id">#${b.id}</span>
         <div style="display:flex;align-items:center;gap:6px">
-          ${isSearch && !isSaved ? `<button onclick="saveToHistory(${b.id})" style="background:var(--gold-bg);border:none;color:var(--gold2);font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;cursor:pointer">+ Simpan</button>` : ''}
-          <span class="status-badge ${stC[b.status]}">${stL[b.status]}</span>
+          ${isSearch && !isSaved ? `<button onclick="event.stopPropagation();saveToHistory(${b.id})" style="background:var(--gold-bg);border:none;color:var(--gold2);font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;cursor:pointer">+ Simpan</button>` : ''}
+          <span class="status-badge ${stC[b.status]}" style="display:inline-flex;align-items:center;gap:4px">${stIcon[b.status]||''}${stL[b.status]}</span>
         </div>
       </div>
       <div class="history-room">${escapeHTML(b.ruangan)}</div>
-      <div class="history-time">${fd(b.tanggal)} • ${b.jamMulai} - ${b.jamSelesai}</div>
+      <div class="history-time">${fd(b.tanggal)} • ${b.jamMulai} – ${b.jamSelesai}</div>
       ${isSearch ? `<div style="font-size:11px;color:var(--text3);margin-top:4px">Pemohon: ${escapeHTML(b.nama)}</div>` : ''}
     </div>
   `;
@@ -499,6 +507,213 @@ function saveToHistory(id){
   localStorage.setItem('labroom_my_bookings', JSON.stringify(myB));
   showToast('Berhasil disimpan ke riwayat saya.','success');
   renderHistory();
+}
+
+/* ─── BOOKING DETAIL MODAL ─── */
+function openBookingDetail(id){
+  const b = GLOBAL_BOOKINGS.find(x => x.id === id);
+  if(!b) { showToast('Data reservasi tidak ditemukan.','error'); return; }
+
+  const stL = {pending:'Menunggu Konfirmasi',approved:'Disetujui',rejected:'Ditolak'};
+  const stC = {pending:'pending',approved:'approved',rejected:'rejected'};
+  const fd  = d => new Date(d+'T00:00:00').toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+
+  // Populate header
+  const badge = document.getElementById('det-status-badge');
+  if(badge){ badge.textContent = stL[b.status] || b.status; badge.className = 'status-badge ' + (stC[b.status] || ''); }
+  const subEl = document.getElementById('det-id-sub');
+  if(subEl) subEl.textContent = `Nomor Permohonan: #${b.id} · Diajukan ${new Date(b.createdAt).toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'})}`;
+
+  // Room & time
+  const elRuangan = document.getElementById('det-ruangan');
+  if(elRuangan) elRuangan.textContent = b.ruangan;
+  const elWaktu = document.getElementById('det-waktu');
+  if(elWaktu) elWaktu.innerHTML = `${fd(b.tanggal)}<br><span style="font-size:13.5px;color:var(--gold2)">${b.jamMulai} – ${b.jamSelesai} WIB</span>`;
+
+  // Applicant
+  const elNama = document.getElementById('det-nama'); if(elNama) elNama.textContent = b.nama;
+  const elInst = document.getElementById('det-instansi'); if(elInst) elInst.textContent = b.instansi || '—';
+  const elKon  = document.getElementById('det-kontak');
+  if(elKon) elKon.innerHTML = `<a href="tel:${b.kontak}" style="color:var(--green);text-decoration:none">${b.kontak}</a>`;
+
+  // Purpose
+  const elKep = document.getElementById('det-keperluan'); if(elKep) elKep.textContent = b.keperluan;
+
+  // Rejection reason
+  const reasonBlock = document.getElementById('det-reject-reason-block');
+  const reasonText  = document.getElementById('det-reject-reason');
+  if(b.status === 'rejected' && b.alasan_penolakan){
+    if(reasonText) reasonText.textContent = b.alasan_penolakan;
+    if(reasonBlock) reasonBlock.style.display = 'block';
+  } else {
+    if(reasonBlock) reasonBlock.style.display = 'none';
+  }
+
+  // Render timeline
+  renderDetailTimeline(b);
+
+  // Render action buttons
+  renderDetailActions(b);
+
+  // Show overlay
+  document.getElementById('booking-detail-overlay').classList.add('show');
+}
+
+function closeBookingDetailModal(){
+  document.getElementById('booking-detail-overlay').classList.remove('show');
+  // Clean up cancel confirm if visible
+  const cf = document.getElementById('det-cancel-confirm-box');
+  if(cf) cf.remove();
+}
+
+function renderDetailTimeline(b){
+  const bar = document.getElementById('det-tl-bar');
+  if(!bar) return;
+  const TL_S = 7*60, TL_D = 10*60;
+  const pct = m => Math.max(0, Math.min(100, ((m - TL_S) / TL_D) * 100));
+  const toM  = t => { const [h,m] = t.split(':').map(Number); return h*60+m; };
+
+  // Other bookings on same room & date
+  const others = GLOBAL_BOOKINGS.filter(x =>
+    x.id !== b.id && x.ruangan === b.ruangan && x.tanggal === b.tanggal && x.status !== 'rejected'
+  );
+
+  let html = '';
+  others.forEach(o => {
+    const s = pct(toM(o.jamMulai)), e = pct(toM(o.jamSelesai));
+    html += `<div class="tl-seg booked" style="left:${s}%;width:${Math.max(e-s,1)}%" title="${escapeHTML(o.nama)}: ${o.jamMulai}–${o.jamSelesai}">${o.jamMulai}–${o.jamSelesai}</div>`;
+  });
+
+  // This booking
+  const cs = pct(toM(b.jamMulai)), ce = pct(toM(b.jamSelesai));
+  const segClass = b.status === 'rejected' ? 'new-bad' : 'new-ok';
+  html += `<div class="tl-seg ${segClass}" style="left:${cs}%;width:${Math.max(ce-cs,1)}%">${b.jamMulai}–${b.jamSelesai}</div>`;
+
+  bar.innerHTML = html;
+}
+
+function renderDetailActions(b){
+  const el = document.getElementById('det-actions');
+  if(!el) return;
+  el.innerHTML = '';
+
+  const fd = d => new Date(d+'T00:00:00').toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'});
+
+  // Copy receipt button (always shown)
+  const copyBtn = document.createElement('button');
+  copyBtn.className = 'det-btn det-btn-copy';
+  copyBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Salin Detail`;
+  copyBtn.onclick = () => copyBookingDetail(b);
+  el.appendChild(copyBtn);
+
+  if(b.status === 'pending'){
+    // Cancel button
+    const cancelBtn = document.createElement('button');
+    cancelBtn.className = 'det-btn det-btn-cancel';
+    cancelBtn.id = 'det-cancel-btn';
+    cancelBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>Batalkan Reservasi`;
+    cancelBtn.onclick = () => showCancelConfirm(b.id, b.ruangan, b.tanggal);
+    el.appendChild(cancelBtn);
+
+  } else if(b.status === 'approved'){
+    // WhatsApp contact button
+    const msg = encodeURIComponent(
+      `Halo Admin LabRoom 👋\n\nSaya ingin menginformasi terkait reservasi yang telah disetujui:\n` +
+      `📋 ID Reservasi: #${b.id}\n` +
+      `🏫 Ruangan: ${b.ruangan}\n` +
+      `📅 Tanggal: ${fd(b.tanggal)}\n` +
+      `🕐 Waktu: ${b.jamMulai} – ${b.jamSelesai} WIB\n` +
+      `👤 Pemohon: ${b.nama}\n\nTerima kasih.`
+    );
+    const waBtn = document.createElement('a');
+    waBtn.className = 'det-btn det-btn-wa';
+    waBtn.href = `https://wa.me/?text=${msg}`;
+    waBtn.target = '_blank';
+    waBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M11.99 2.007A9.956 9.956 0 002.05 11.96c0 1.76.46 3.484 1.333 5.004L2 22l5.232-1.361A9.952 9.952 0 0011.99 22c5.514 0 9.993-4.479 9.993-9.994 0-2.67-1.04-5.18-2.928-7.069A9.925 9.925 0 0011.99 2.007z"/></svg>Hubungi Admin`;
+    el.appendChild(waBtn);
+  }
+}
+
+function showCancelConfirm(id, ruangan, tanggal){
+  // Remove existing
+  const existing = document.getElementById('det-cancel-confirm-box');
+  if(existing) existing.remove();
+
+  const fd = d => new Date(d+'T00:00:00').toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'});
+  const el = document.getElementById('det-actions');
+  const box = document.createElement('div');
+  box.id = 'det-cancel-confirm-box';
+  box.className = 'det-cancel-confirm';
+  box.innerHTML = `
+    <div class="det-cancel-msg">
+      Yakin ingin membatalkan reservasi <strong>${escapeHTML(ruangan)}</strong>
+      pada <strong>${fd(tanggal)}</strong>?<br>
+      <span style="font-size:11px;color:var(--text3);margin-top:4px;display:block">Tindakan ini tidak dapat dibatalkan.</span>
+    </div>
+    <div class="det-cancel-btns">
+      <button class="det-cancel-yes" onclick="cancelBooking(${id})">Ya, Batalkan</button>
+      <button class="det-cancel-no" onclick="document.getElementById('det-cancel-confirm-box').remove()">Tidak</button>
+    </div>
+  `;
+  el.parentNode.insertBefore(box, el.nextSibling);
+}
+
+async function cancelBooking(id){
+  const btn = document.querySelector('.det-cancel-yes');
+  if(btn){ btn.disabled = true; btn.textContent = 'Membatalkan...'; }
+
+  try {
+    const res = await fetch(`/api/bookings/${id}`, { method: 'DELETE' });
+    const data = await res.json();
+    if(data.success){
+      // Remove from global state
+      GLOBAL_BOOKINGS = GLOBAL_BOOKINGS.filter(b => b.id !== id);
+      // Remove from local storage
+      let myB = JSON.parse(localStorage.getItem('labroom_my_bookings') || '[]');
+      myB = myB.filter(x => x !== id);
+      localStorage.setItem('labroom_my_bookings', JSON.stringify(myB));
+      // Close modal & refresh sidebar
+      closeBookingDetailModal();
+      renderSidebar();
+      // Refresh history list if open
+      if(document.getElementById('status-overlay').classList.contains('show')){
+        const myC = localStorage.getItem('labroom_my_contact');
+        if(myC) doSearchHistory(myC); else renderHistory();
+      }
+      showToast(`Reservasi #${id} berhasil dibatalkan.`, 'success');
+    } else {
+      showToast('Gagal membatalkan reservasi.', 'error');
+      if(btn){ btn.disabled = false; btn.textContent = 'Ya, Batalkan'; }
+    }
+  } catch(e){
+    console.error(e);
+    showToast('Terjadi kesalahan server.', 'error');
+    if(btn){ btn.disabled = false; btn.textContent = 'Ya, Batalkan'; }
+  }
+}
+
+function copyBookingDetail(b){
+  const fd = d => new Date(d+'T00:00:00').toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  const stL = {pending:'Menunggu Konfirmasi',approved:'Disetujui',rejected:'Ditolak'};
+  const text =
+    `📋 DETAIL RESERVASI LABROOM\n` +
+    `─────────────────────────\n` +
+    `No. Permohonan : #${b.id}\n` +
+    `Status         : ${stL[b.status] || b.status}\n` +
+    `Ruangan        : ${b.ruangan}\n` +
+    `Tanggal        : ${fd(b.tanggal)}\n` +
+    `Waktu          : ${b.jamMulai} – ${b.jamSelesai} WIB\n` +
+    `─────────────────────────\n` +
+    `Pemohon        : ${b.nama}\n` +
+    `Instansi       : ${b.instansi || '—'}\n` +
+    `Kontak WA      : ${b.kontak}\n` +
+    `Keperluan      : ${b.keperluan}\n` +
+    `─────────────────────────\n` +
+    `Sistem Reservasi Lab Terpadu — Universitas Tanjungpura`;
+
+  navigator.clipboard.writeText(text)
+    .then(() => showToast('Detail reservasi berhasil disalin!', 'success'))
+    .catch(() => showToast('Gagal menyalin teks.', 'error'));
 }
 
 function doSearchHistory(qOverride){

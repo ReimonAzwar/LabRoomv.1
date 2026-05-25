@@ -107,13 +107,81 @@ function setListFilter(f,btn){clf=f;['all','pending','approved','rejected'].forE
 function setListSearch(q){lsq=q.toLowerCase();renderListTable();}
 
 let rmN='',rmS='available';
-function openRoomMgmt(name){const rooms=lr();const r=rooms.find(x=>x.name===name);if(!r)return;rmN=name;rmS=r.status||'available';document.getElementById('rmgmt-title').textContent='Kelola: '+name;document.getElementById('rmgmt-sub').textContent='Edit kapasitas, fasilitas dan status ruangan';document.getElementById('rmgmt-cap').value=r.cap||'';document.getElementById('rmgmt-fasilitas').value=r.fasilitas||'';document.getElementById('rmgmt-until').value=r.closedUntil||'';pickStatus(rmS,false);document.getElementById('room-mgmt-overlay').classList.add('show');}
+function openRoomMgmt(name){
+  const rooms=lr();const r=rooms.find(x=>x.name===name);if(!r)return;
+  rmN=name;rmS=r.status||'available';
+  document.getElementById('rmgmt-title').textContent='Kelola: '+name;
+  document.getElementById('rmgmt-sub').textContent='Edit kapasitas, fasilitas dan status ruangan';
+  document.getElementById('rmgmt-cap').value=r.cap||'';
+  
+  // PARSE FACILITIES CHECKLIST
+  const str = r.fasilitas || '';
+  document.getElementById('fac-ac').checked = false;
+  document.getElementById('fac-proyektor').checked = false;
+  document.getElementById('fac-wifi').checked = false;
+  document.getElementById('fac-board').checked = false;
+  document.getElementById('fac-sound').checked = false;
+  document.getElementById('fac-pc-chk').checked = false;
+  document.getElementById('fac-pc-qty').value = '';
+  document.getElementById('fac-pc-qty').disabled = true;
+  document.getElementById('rmgmt-fasilitas').value = '';
+
+  if (str) {
+    const parts = str.split(',').map(x => x.trim()).filter(Boolean);
+    const remaining = [];
+    parts.forEach(p => {
+      const pl = p.toLowerCase();
+      if (pl === 'ac') {
+        document.getElementById('fac-ac').checked = true;
+      } else if (pl.includes('proyektor') || pl.includes('lcd')) {
+        document.getElementById('fac-proyektor').checked = true;
+      } else if (pl === 'wifi' || pl.includes('internet')) {
+        document.getElementById('fac-wifi').checked = true;
+      } else if (pl.includes('papan tulis') || pl.includes('board') || pl.includes('whiteboard')) {
+        document.getElementById('fac-board').checked = true;
+      } else if (pl.includes('sound') || pl.includes('speaker')) {
+        document.getElementById('fac-sound').checked = true;
+      } else if (pl.includes('pc') || pl.includes('komputer')) {
+        const match = p.match(/(\d+)\s*(pc|komputer)/i);
+        document.getElementById('fac-pc-chk').checked = true;
+        document.getElementById('fac-pc-qty').disabled = false;
+        if (match) {
+          document.getElementById('fac-pc-qty').value = match[1];
+        }
+      } else {
+        remaining.push(p);
+      }
+    });
+    if (remaining.length > 0) {
+      document.getElementById('rmgmt-fasilitas').value = remaining.join(', ');
+    }
+  }
+
+  document.getElementById('rmgmt-until').value=r.closedUntil||'';
+  pickStatus(rmS,false);
+  document.getElementById('room-mgmt-overlay').classList.add('show');
+}
 function closeRoomMgmt(){document.getElementById('room-mgmt-overlay').classList.remove('show');}
 document.getElementById('room-mgmt-overlay').addEventListener('click',function(e){if(e.target===this)closeRoomMgmt();});
 function pickStatus(st){rmS=st;document.querySelectorAll('.stp').forEach(b=>b.classList.remove('active'));const b=document.querySelector('.stp.'+st);if(b)b.classList.add('active');document.getElementById('rmgmt-until-wrap').style.display=(st==='maintenance'||st==='closed')?'block':'none';}
 async function saveRoomMgmt(){
   const cap=document.getElementById('rmgmt-cap').value||'30';
-  const fasilitas=document.getElementById('rmgmt-fasilitas').value.trim();
+  
+  // COMPILE FACILITIES CHECKLIST
+  const parts = [];
+  if (document.getElementById('fac-ac').checked) parts.push('AC');
+  if (document.getElementById('fac-proyektor').checked) parts.push('Proyektor');
+  if (document.getElementById('fac-wifi').checked) parts.push('WiFi');
+  if (document.getElementById('fac-board').checked) parts.push('Papan Tulis');
+  if (document.getElementById('fac-sound').checked) parts.push('Sound System');
+  if (document.getElementById('fac-pc-chk').checked) {
+    const qty = document.getElementById('fac-pc-qty').value;
+    parts.push(qty ? qty + ' PC' : 'PC');
+  }
+  const other = document.getElementById('rmgmt-fasilitas').value.trim();
+  if (other) parts.push(other);
+  const fasilitas = parts.join(', ');
+
   const closedUntil=rmS==='available'?'':document.getElementById('rmgmt-until').value;
   try {
     await fetch('/api/rooms/'+rmN, {
