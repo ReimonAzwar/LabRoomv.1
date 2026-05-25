@@ -1,4 +1,4 @@
-const USERS=[{id:1,username:'admin',password:'lab2026',nama:'Administrator',role:'admin'},{id:2,username:'superadmin',password:'super@123',nama:'Super Admin',role:'superadmin'},{id:3,username:'labmanager',password:'mgr2026',nama:'Manajer Lab',role:'manager'}];
+// USERS array removed, login via backend API
 const SK='labroom_session';
 let GLOBAL_ROOMS = [];
 let GLOBAL_BOOKINGS = [];
@@ -29,17 +29,33 @@ async function doLogin(){
   err.classList.remove('show');btn.disabled=true;
   btn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="animation:spin .7s linear infinite;width:16px;height:16px"><path d="M21 12a9 9 0 11-6.219-8.56"/></svg> Memverifikasi...';
   
-  const f=USERS.find(x=>x.username===u&&x.password===p);
-  if(f){
-    ss(f);
-    await fetchData();
-    document.getElementById('login-page').classList.add('hidden');document.getElementById('admin-page').classList.add('active');document.getElementById('logged-user').textContent=f.nama;renderAdmin();
-  } else {
-    document.getElementById('lerr-txt').textContent='Username atau password salah. Coba lagi.';err.classList.add('show');document.getElementById('inp-user').classList.add('err');document.getElementById('inp-pw').classList.add('err');
+  try {
+    const res = await fetch('/api/admin/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content },
+      body: JSON.stringify({username: u, password: p})
+    });
+    const data = await res.json();
+    if(data.success){
+      ss({ id: data.user.id, username: data.user.username, nama: data.user.name, role: data.user.role });
+      window.location.reload();
+    } else {
+      document.getElementById('lerr-txt').textContent=data.message||'Username atau password salah. Coba lagi.';
+      err.classList.add('show');document.getElementById('inp-user').classList.add('err');document.getElementById('inp-pw').classList.add('err');
+    }
+  } catch(e) {
+    document.getElementById('lerr-txt').textContent='Terjadi kesalahan jaringan.';
+    err.classList.add('show');
   }
   btn.disabled=false;btn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg> Masuk ke Dashboard';
 }
-function doLogout(){cs();document.getElementById('admin-page').classList.remove('active');document.getElementById('login-page').classList.remove('hidden');document.getElementById('inp-user').value='';document.getElementById('inp-pw').value='';document.getElementById('inp-user').classList.remove('err');document.getElementById('inp-pw').classList.remove('err');document.getElementById('lerr').classList.remove('show');showToast('Berhasil keluar dari sistem.','success');}
+async function doLogout(){
+  try {
+    await fetch('/api/admin/logout', { method: 'POST', headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content } });
+  } catch(e){}
+  cs();
+  window.location.reload();
+}
 
 let cur='dashboard',clf='all',cdf='all',dsq='',lsq='';
 function navTo(sec,btn){

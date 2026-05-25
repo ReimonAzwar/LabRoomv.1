@@ -10,12 +10,19 @@ Route::get('/', function () {
     return view('user');
 });
 
+use Illuminate\Support\Facades\Auth;
+
 Route::get('/admin', function () {
-    return view('admin_panel');
+    return view('admin_panel', [
+        'adminRole' => Auth::check() ? Auth::user()->role : 'admin', 
+        'adminUser' => Auth::user()
+    ]);
 });
 
 // API Routes for JS frontend
 Route::prefix('api')->group(function() {
+    Route::post('/admin/login', [\App\Http\Controllers\AdminAuthController::class, 'login']);
+    Route::post('/admin/logout', [\App\Http\Controllers\AdminAuthController::class, 'logout']);
     Route::get('/rooms', [ApiController::class, 'getRooms']);
     Route::post('/rooms/{name}', [ApiController::class, 'updateRoom']);
     
@@ -27,4 +34,5 @@ Route::prefix('api')->group(function() {
 
     // Notification routes
     Route::post('/notify/whatsapp', [NotificationController::class, 'sendWhatsApp']);
+    Route::post('/admins', [App\\Http\\Controllers\\SuperAdminController::class, 'store']);
 });
