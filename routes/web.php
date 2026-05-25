@@ -21,8 +21,8 @@ Route::get('/admin', function () {
 
 // API Routes for JS frontend
 Route::prefix('api')->group(function() {
-    Route::post('/admin/login', [\App\Http\Controllers\AdminAuthController::class, 'login']);
-    Route::post('/admin/logout', [\App\Http\Controllers\AdminAuthController::class, 'logout']);
+    Route::post('/admin/login', [App\Http\Controllers\AdminAuthController::class, 'login']);
+    Route::post('/admin/logout', [App\Http\Controllers\AdminAuthController::class, 'logout']);
     Route::get('/rooms', [ApiController::class, 'getRooms']);
     Route::post('/rooms/{name}', [ApiController::class, 'updateRoom']);
     
@@ -34,5 +34,9 @@ Route::prefix('api')->group(function() {
 
     // Notification routes
     Route::post('/notify/whatsapp', [NotificationController::class, 'sendWhatsApp']);
-    Route::post('/admins', [App\\Http\\Controllers\\SuperAdminController::class, 'store']);
+    // Admin account CRUD routes (superadmin)
+    Route::get('/admin/accounts', [App\Http\Controllers\AdminAccountController::class, 'index']);
+    Route::post('/admin/accounts', [App\Http\Controllers\AdminAccountController::class, 'store']);
+    Route::put('/admin/accounts/{id}', [App\Http\Controllers\AdminAccountController::class, 'update']);
+    Route::delete('/admin/accounts/{id}', [App\Http\Controllers\AdminAccountController::class, 'destroy']);
 });
