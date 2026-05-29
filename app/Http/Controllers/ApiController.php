@@ -103,10 +103,10 @@ class ApiController extends Controller
         $action = $request->status === 'approved' ? 'approve_booking' : ($request->status === 'rejected' ? 'reject_booking' : 'reset_booking');
         $statusLabel = $request->status === 'approved' ? 'menyetujui' : ($request->status === 'rejected' ? 'menolak' : 'mereset');
         $roomName = $booking->room->nama_ruang ?? 'Unknown';
-        $details = "Admin " . (auth()->user()->name ?? 'System') . " {$statusLabel} pemesanan #{$booking->id} oleh {$booking->nama} (Ruangan: {$roomName})." . ($request->alasan_penolakan ? " Catatan: \"{$request->alasan_penolakan}\"" : "");
+        $details = "Admin " . (auth('web')->user()->name ?? 'System') . " {$statusLabel} pemesanan #{$booking->id} oleh {$booking->nama} (Ruangan: {$roomName})." . ($request->alasan_penolakan ? " Catatan: \"{$request->alasan_penolakan}\"" : "");
 
         ActivityLog::create([
-            'user_id' => auth()->id(),
+            'user_id' => auth('web')->id(),
             'action' => $action,
             'model_type' => 'Booking',
             'model_id' => $booking->id,
@@ -123,9 +123,9 @@ class ApiController extends Controller
         $booking->delete();
 
         $roomName = $booking->room->nama_ruang ?? 'Unknown';
-        $details = "Admin " . (auth()->user()->name ?? 'System') . " menghapus pemesanan #{$booking->id} oleh {$booking->nama} (Ruangan: {$roomName}).";
+        $details = "Admin " . (auth('web')->user()->name ?? 'System') . " menghapus pemesanan #{$booking->id} oleh {$booking->nama} (Ruangan: {$roomName}).";
         ActivityLog::create([
-            'user_id' => auth()->id(),
+            'user_id' => auth('web')->id(),
             'action' => 'delete_booking',
             'model_type' => 'Booking',
             'model_id' => $booking->id,
@@ -149,9 +149,9 @@ class ApiController extends Controller
 
         $room->save();
 
-        $details = "Admin " . (auth()->user()->name ?? 'System') . " mengubah data ruangan {$room->name}. Status: {$room->status}, Kapasitas: {$room->cap} orang.";
+        $details = "Admin " . (auth('web')->user()->name ?? 'System') . " mengubah data ruangan {$room->name}. Status: {$room->status}, Kapasitas: {$room->cap} orang.";
         ActivityLog::create([
-            'user_id' => auth()->id(),
+            'user_id' => auth('web')->id(),
             'action' => 'update_room',
             'model_type' => 'Room',
             'model_id' => $room->id,
@@ -182,9 +182,9 @@ class ApiController extends Controller
 
         $booking->save();
 
-        $details = "Admin " . (auth()->user()->name ?? 'System') . " mengubah rincian pemesanan #{$booking->id} oleh {$booking->nama}.";
+        $details = "Admin " . (auth('web')->user()->name ?? 'System') . " mengubah rincian pemesanan #{$booking->id} oleh {$booking->nama}.";
         ActivityLog::create([
-            'user_id' => auth()->id(),
+            'user_id' => auth('web')->id(),
             'action' => 'update_booking',
             'model_type' => 'Booking',
             'model_id' => $booking->id,

@@ -1080,7 +1080,18 @@ async function saveSuperAdminProfile() {
 
 
 (async function(){
-  const s=gs();
+  if(window.LABROOM_ADMIN && !window.LABROOM_ADMIN.username){
+    cs();
+  }
+  let s=gs();
+  if(!s && window.LABROOM_ADMIN && window.LABROOM_ADMIN.username){
+    s = {
+      role: window.LABROOM_ADMIN.role || 'admin',
+      username: window.LABROOM_ADMIN.username,
+      nama: window.LABROOM_ADMIN.name || window.LABROOM_ADMIN.username,
+    };
+    ss(s);
+  }
   if(s){
     document.getElementById('login-page').classList.add('hidden');
     document.getElementById('admin-page').classList.add('active');

@@ -11,19 +11,21 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('bookings', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('room_id')->constrained('rooms')->onDelete('cascade');
-            $table->string('nama');
-            $table->string('instansi');
-            $table->string('kontak');
-            $table->date('tanggal');
-            $table->time('jam_mulai');
-            $table->time('jam_selesai');
-            $table->string('keperluan');
-            $table->enum('status', ['pending', 'disetujui', 'ditolak'])->default('pending');
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('bookings')) {
+            Schema::create('bookings', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('room_id')->constrained('rooms')->onDelete('cascade');
+                $table->string('nama');
+                $table->string('instansi');
+                $table->string('kontak');
+                $table->date('tanggal');
+                $table->time('jam_mulai');
+                $table->time('jam_selesai');
+                $table->string('keperluan');
+                $table->enum('status', ['pending', 'disetujui', 'ditolak'])->default('pending');
+                $table->timestamps();
+            });
+        }
     }
 
     /**

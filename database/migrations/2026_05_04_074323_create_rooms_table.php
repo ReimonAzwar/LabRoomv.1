@@ -11,15 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('rooms', function (Blueprint $table) {
-            $table->id();
-            $table->string('nama_ruang');
-            $table->integer('kapasitas')->default(30);
-            $table->text('fasilitas')->nullable();
-            $table->enum('status', ['dibuka', 'maintenance', 'ditutup'])->default('dibuka');
-            $table->date('batas_tutup')->nullable();
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('rooms')) {
+            Schema::create('rooms', function (Blueprint $table) {
+                $table->id();
+                $table->string('nama_ruang');
+                $table->integer('kapasitas')->default(30);
+                $table->text('fasilitas')->nullable();
+                $table->enum('status', ['dibuka', 'maintenance', 'ditutup'])->default('dibuka');
+                $table->date('batas_tutup')->nullable();
+                $table->timestamps();
+            });
+        }
     }
 
     /**

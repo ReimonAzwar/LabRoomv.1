@@ -24,7 +24,7 @@ class SystemSettingController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
-        if (auth()->check() && auth()->user()->role !== 'super_admin') {
+        if (auth('web')->check() && auth('web')->user()->role !== 'super_admin') {
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
         }
 
@@ -46,9 +46,9 @@ class SystemSettingController extends Controller
 
         // Generate activity log
         ActivityLog::create([
-            'user_id' => auth()->id(),
+            'user_id' => auth('web')->id(),
             'action' => 'update_settings',
-            'details' => "Admin " . (auth()->user()->name ?? 'System') . " memperbarui pengaturan sistem (Jam Operasional: {$settings['operational_hours_start']}–{$settings['operational_hours_end']}).",
+            'details' => "Admin " . (auth('web')->user()->name ?? 'System') . " memperbarui pengaturan sistem (Jam Operasional: {$settings['operational_hours_start']}–{$settings['operational_hours_end']}).",
             'ip_address' => $request->ip()
         ]);
 
