@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sisiru — Sistem Reservasi Ruangan Lab Terpadu | Universitas Tanjungpura</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600;700&family=Source+Sans+3:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="{{ asset('css/user/style.css') }}?v=1779328899">
 </head>
 <body>
@@ -32,28 +32,6 @@
       <div class="s-card-body" id="room-status-list"></div>
     </div>
 
-    <!-- Info -->
-    <div class="s-card anim-ready">
-      <div class="s-card-header">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-        <div class="s-card-title">Informasi</div>
-      </div>
-      <div class="s-card-body">
-        <div class="info-row">
-          <div class="iicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
-          <div class="itext"><strong>Jam Operasional</strong>Senin–Jumat, 07:00–17:00 WIB</div>
-        </div>
-        <div class="info-row">
-          <div class="iicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 016.19 16a19.79 19.79 0 01-3.07-8.63A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg></div>
-          <div class="itext"><strong>Kontak Admin</strong>(0561) 123-456 ext. 200</div>
-        </div>
-        <div class="info-row">
-          <div class="iicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></div>
-          <div class="itext"><strong>Kapasitas</strong>Lab: 20–30 orang · Seminar: 60 orang</div>
-        </div>
-      </div>
-    </div>
-
     <!-- Notice -->
     <div class="notice-card anim-ready">
       <div class="notice-title">
@@ -65,6 +43,7 @@
       <div class="notice-item">Pembatalan harap melapor sebelum H-1</div>
       <div class="notice-item">Ruangan harus ditinggalkan dalam kondisi bersih</div>
     </div>
+
 
   </div>
 
@@ -126,8 +105,52 @@
   </div>
 </div>
 
-<!-- FOOTER -->
-@include('user.footer')
+<!-- FOOTER (contact + map + copyright) -->
+<footer class="site-footer">
+  <div class="sf-top">
+    <div class="sf-info">
+      <div class="sf-logo-row">
+        <img src="/images/logo_untan.png" alt="Untan" style="height:32px;opacity:.9">
+        <div>
+          <div class="sf-brand font-display">Laboratorium Terpadu</div>
+          <div class="sf-brand-sub">Universitas Tanjungpura</div>
+        </div>
+      </div>
+      <p class="sf-desc">Sistem reservasi ruangan laboratorium terpadu untuk civitas akademika dan mitra Universitas Tanjungpura.</p>
+      <div class="sf-contacts">
+        <div class="sf-ci">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 016.19 16a19.79 19.79 0 01-3.07-8.63A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+          <span>{{ $settings['contact_phone'] ?? '(0561) 736180' }}</span>
+        </div>
+        <div class="sf-ci">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          <span>{{ $settings['contact_email'] ?? 'kampus@untan.ac.id' }}</span>
+        </div>
+        <div class="sf-ci">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <span>Senin–Jumat, {{ $settings['operational_hours_start'] ?? '07:00' }}–{{ $settings['operational_hours_end'] ?? '17:00' }} WIB</span>
+        </div>
+        <div class="sf-ci">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          <span>{{ $settings['contact_address'] ?? 'Jl. Jenderal Ahmad Yani, Pontianak' }}</span>
+        </div>
+      </div>
+    </div>
+    <div class="sf-map">
+      @if(!empty($settings['gmaps_iframe_url']))
+      <iframe src="{{ $settings['gmaps_iframe_url'] }}" width="100%" height="100%" style="border:0;border-radius:10px;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+      @else
+      <div style="display:flex;align-items:center;justify-content:center;height:100%;color:rgba(200,168,75,.3);font-size:12px;">Peta belum dikonfigurasi</div>
+      @endif
+    </div>
+  </div>
+  <div class="sf-bottom">
+    <span>© 2026 Laboratorium Keilmuan Dasar Universitas Tanjungpura. All Rights Reserved.</span>
+    <button class="scroll-to-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Kembali ke atas">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px"><polyline points="18 15 12 9 6 15"/></svg>
+    </button>
+  </div>
+</footer>
 <script src="{{ asset('js/user/script.js') }}?v=1779328899"></script>
 
 <div class="rc-overlay" id="status-overlay">

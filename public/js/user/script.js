@@ -262,10 +262,13 @@ function injectFormCard(){
 
         <div class="fc-field" id="field-fakultas" style="display:none">
           <label class="fc-label">Fakultas / Bagian <span class="req">*</span></label>
-          <select class="fc-input" id="f-fakultas" onchange="vld('f-fakultas','e-fakultas')">
-            <option value="">— Pilih Fakultas —</option>
-            ${fakultasOptions}
-          </select>
+          <div class="select-input-wrap">
+            <svg class="select-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+            <select class="fc-input fc-select-custom" id="f-fakultas" onchange="vld('f-fakultas','e-fakultas')">
+              <option value="">— Pilih Fakultas —</option>
+              ${fakultasOptions}
+            </select>
+          </div>
           <div class="err-text" id="e-fakultas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="width:12px;height:12px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Pilih fakultas Anda</div>
         </div>
       </div>
@@ -280,10 +283,13 @@ function injectFormCard(){
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
           <div class="fc-field">
             <label class="fc-label">Ruangan <span class="req">*</span></label>
-            <select class="fc-input" id="f-ruangan" onchange="onRoomDateChange();showRoomInfo()">
-              <option value="">— Pilih Ruangan —</option>
-              ${roomOpts}
-            </select>
+            <div class="select-input-wrap">
+              <svg class="select-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              <select class="fc-input fc-select-custom" id="f-ruangan" onchange="onRoomDateChange();showRoomInfo()">
+                <option value="">— Pilih Ruangan —</option>
+                ${roomOpts}
+              </select>
+            </div>
             <div class="err-text" id="e-ruangan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="width:12px;height:12px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Pilih ruangan</div>
           </div>
           <div class="fc-field">
@@ -1165,6 +1171,21 @@ async function init(){
   addBotMsg(`Silakan lengkapi formulir di bawah ini. Sistem akan memeriksa ketersediaan jadwal secara <strong>real-time</strong> dan otomatis mendeteksi konflik jadwal.`);
   await showTyping();
   injectFormCard();
+}
+
+function toggleUserMobileMenu(force) {
+  const menu = document.getElementById('user-mobile-menu');
+  const overlay = document.getElementById('user-mobile-overlay');
+  if (!menu) return;
+  
+  const show = typeof force === 'boolean' ? force : !menu.classList.contains('open');
+  if (show) {
+    menu.classList.add('open');
+    if (overlay) overlay.classList.add('open');
+  } else {
+    menu.classList.remove('open');
+    if (overlay) overlay.classList.remove('open');
+  }
 }
 
 init();

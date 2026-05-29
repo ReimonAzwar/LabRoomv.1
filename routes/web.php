@@ -7,7 +7,8 @@ use App\Http\Controllers\ApiController;
 use App\Http\Controllers\NotificationController;
 
 Route::get('/', function () {
-    return view('user');
+    $settings = \App\Models\SystemSetting::all()->pluck('value', 'key');
+    return view('user', compact('settings'));
 });
 
 use Illuminate\Support\Facades\Auth;
@@ -39,4 +40,14 @@ Route::prefix('api')->group(function() {
     Route::post('/admin/accounts', [App\Http\Controllers\AdminAccountController::class, 'store']);
     Route::put('/admin/accounts/{id}', [App\Http\Controllers\AdminAccountController::class, 'update']);
     Route::delete('/admin/accounts/{id}', [App\Http\Controllers\AdminAccountController::class, 'destroy']);
+
+    // Super admin extra features
+    Route::get('/admin/activity-logs', [App\Http\Controllers\ActivityLogController::class, 'index']);
+    Route::get('/admin/stats', [App\Http\Controllers\StatsController::class, 'index']);
+    Route::get('/admin/reports/csv', [App\Http\Controllers\ReportController::class, 'exportCsv']);
+    Route::get('/admin/settings', [App\Http\Controllers\SystemSettingController::class, 'index']);
+    Route::post('/admin/settings', [App\Http\Controllers\SystemSettingController::class, 'store']);
+
+    // Super admin — update own profile (username & password)
+    Route::put('/admin/profile', [App\Http\Controllers\SuperAdminController::class, 'updateProfile']);
 });

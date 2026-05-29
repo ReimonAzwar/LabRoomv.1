@@ -22,7 +22,14 @@ class RoomSeeder extends Seeder
         ];
 
         foreach ($rooms as $room) {
-            Room::create($room);
+            Room::updateOrCreate(
+                ['name' => $room['name']],
+                [
+                    'cap' => $room['cap'],
+                    'fasilitas' => $room['fasilitas'],
+                    'status' => $room['status']
+                ]
+            );
         }
     }
 }

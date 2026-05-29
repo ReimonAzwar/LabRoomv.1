@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Room;
 use App\Models\Booking;
 use Carbon\Carbon;
+use App\Models\ActivityLog;
 
 class ApiController extends Controller
 {
@@ -99,6 +100,20 @@ class ApiController extends Controller
 
         $booking->update($updateData);
 
+        $action = $request->status === 'approved' ? 'approve_booking' : ($request->status === 'rejected' ? 'reject_booking' : 'reset_booking');
+        $statusLabel = $request->status === 'approved' ? 'menyetujui' : ($request->status === 'rejected' ? 'menolak' : 'mereset');
+        $roomName = $booking->room->nama_ruang ?? 'Unknown';
+        $details = "Admin " . (auth()->user()->name ?? 'System') . " {$statusLabel} pemesanan #{$booking->id} oleh {$booking->nama} (Ruangan: {$roomName})." . ($request->alasan_penolakan ? " Catatan: \"{$request->alasan_penolakan}\"" : "");
+
+        ActivityLog::create([
+            'user_id' => auth()->id(),
+            'action' => $action,
+            'model_type' => 'Booking',
+            'model_id' => $booking->id,
+            'details' => $details,
+            'ip_address' => $request->ip()
+        ]);
+
         return response()->json(['success' => true]);
     }
 
@@ -106,6 +121,18 @@ class ApiController extends Controller
     {
         $booking = Booking::findOrFail($id);
         $booking->delete();
+
+        $roomName = $booking->room->nama_ruang ?? 'Unknown';
+        $details = "Admin " . (auth()->user()->name ?? 'System') . " menghapus pemesanan #{$booking->id} oleh {$booking->nama} (Ruangan: {$roomName}).";
+        ActivityLog::create([
+            'user_id' => auth()->id(),
+            'action' => 'delete_booking',
+            'model_type' => 'Booking',
+            'model_id' => $booking->id,
+            'details' => $details,
+            'ip_address' => request()->ip()
+        ]);
+
         return response()->json(['success' => true]);
     }
 
@@ -121,6 +148,17 @@ class ApiController extends Controller
         if ($request->has('closedUntil')) $room->closedUntil = $request->closedUntil ?: null;
 
         $room->save();
+
+        $details = "Admin " . (auth()->user()->name ?? 'System') . " mengubah data ruangan {$room->name}. Status: {$room->status}, Kapasitas: {$room->cap} orang.";
+        ActivityLog::create([
+            'user_id' => auth()->id(),
+            'action' => 'update_room',
+            'model_type' => 'Room',
+            'model_id' => $room->id,
+            'details' => $details,
+            'ip_address' => $request->ip()
+        ]);
+
         return response()->json(['success' => true]);
     }
 
@@ -143,6 +181,17 @@ class ApiController extends Controller
         }
 
         $booking->save();
+
+        $details = "Admin " . (auth()->user()->name ?? 'System') . " mengubah rincian pemesanan #{$booking->id} oleh {$booking->nama}.";
+        ActivityLog::create([
+            'user_id' => auth()->id(),
+            'action' => 'update_booking',
+            'model_type' => 'Booking',
+            'model_id' => $booking->id,
+            'details' => $details,
+            'ip_address' => $request->ip()
+        ]);
+
         return response()->json(['success' => true]);
     }
 }

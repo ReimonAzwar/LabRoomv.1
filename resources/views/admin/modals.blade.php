@@ -68,17 +68,18 @@
   </div>
 </div>
 
-<div class="ov" id="edit-overlay">
+{{-- Old inline room-calendar edit modal (renamed to avoid ID conflict with main edit-overlay) --}}
+<div class="ov" id="rc-edit-overlay">
   <div class="modal" style="max-width:460px">
     <div class="mhd"><div class="mttl">Edit Reservasi</div><div class="msub" id="edit-sub">—</div></div>
-    <div class="mf"><div class="ml">Nama Pemohon</div><input class="fci" id="edit-nama" type="text"/></div>
+    <div class="mf"><div class="ml">Nama Pemohon</div><input class="fci" id="rc-edit-nama" type="text"/></div>
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px">
-      <div><div class="ml">Tanggal</div><input class="fci" id="edit-tanggal" type="date"/></div>
-      <div><div class="ml">Jam Mulai</div><input class="fci" id="edit-mulai" type="time"/></div>
-      <div><div class="ml">Jam Selesai</div><input class="fci" id="edit-selesai" type="time"/></div>
+      <div><div class="ml">Tanggal</div><input class="fci" id="rc-edit-tanggal" type="date"/></div>
+      <div><div class="ml">Jam Mulai</div><input class="fci" id="rc-edit-mulai" type="time"/></div>
+      <div><div class="ml">Jam Selesai</div><input class="fci" id="rc-edit-selesai" type="time"/></div>
     </div>
-    <div class="mf"><div class="ml">Keperluan</div><input class="fci" id="edit-kep" type="text"/></div>
-    <div class="mac"><button class="mb svc" onclick="saveEdit()">Simpan</button><button class="mb cnc" onclick="closeEdit()">Batal</button></div>
+    <div class="mf"><div class="ml">Keperluan</div><input class="fci" id="rc-edit-kep" type="text"/></div>
+    <div class="mac"><button class="mb svc" onclick="saveRcEdit()">Simpan</button><button class="mb cnc" onclick="closeRcEdit()">Batal</button></div>
   </div>
 </div>
 
@@ -97,9 +98,25 @@
     <div class="mf"><div class="ml">Keperluan</div><div class="mv" id="m-kep">—</div></div>
     <div class="mtl"><div class="mtll">Peta jadwal ruangan pada hari tersebut:</div><div class="mtlb" id="m-tl-bar"></div><div class="mtlt"><span>07:00</span><span>09:00</span><span>11:00</span><span>13:00</span><span>15:00</span><span>17:00</span></div></div>
     <div class="mwarn" id="m-warn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span id="m-warn-text">—</span></div>
+    <div class="mac" id="m-actions-pending" style="display:none">
+      <div style="display:flex;flex-direction:column;gap:8px;width:100%">
+        <div style="display:flex;gap:8px">
+          <button class="mb apc" id="m-approve" style="flex:1;display:flex;align-items:center;justify-content:center;gap:5px">
+            <svg viewBox="0 0 24 24" fill="currentColor" style="width:14px;height:14px"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M11.99 2A9.956 9.956 0 002.05 11.96c0 1.76.46 3.48 1.333 5.004L2 22l5.232-1.361A9.952 9.952 0 0011.99 22c5.514 0 9.993-4.479 9.993-9.994A9.96 9.96 0 0011.99 2z"/></svg>
+            ✔ Setujui + Notif WA
+          </button>
+          <button class="mb apc" id="m-approve-silent" style="flex:1;background:var(--green);border-color:var(--green);opacity:.85">✔ Setujui Tanpa Notif</button>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="mb rjc" id="m-reject" style="flex:1;display:flex;align-items:center;justify-content:center;gap:5px">
+            <svg viewBox="0 0 24 24" fill="currentColor" style="width:14px;height:14px"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M11.99 2A9.956 9.956 0 002.05 11.96c0 1.76.46 3.48 1.333 5.004L2 22l5.232-1.361A9.952 9.952 0 0011.99 22c5.514 0 9.993-4.479 9.993-9.994A9.96 9.96 0 0011.99 2z"/></svg>
+            ✕ Tolak + Notif WA
+          </button>
+          <button class="mb rjc" id="m-reject-silent" style="flex:1;opacity:.85">✕ Tolak Tanpa Notif</button>
+        </div>
+      </div>
+    </div>
     <div class="mac">
-      <button class="mb apc" id="m-approve">✔ Setujui</button>
-      <button class="mb rjc" id="m-reject">✕ Tolak</button>
       <button class="mb cnc" onclick="closeModal()">Tutup</button>
     </div>
   </div>

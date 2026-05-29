@@ -13,11 +13,13 @@ class SuperAdminSeeder extends Seeder
      */
     public function run(): void
     {
-        User::create([
-            'name' => 'Super Administrator',
-            'username' => 'superadmin',
-            'password' => Hash::make('super@2026'),
-            'role' => 'super_admin',
-        ]);
+        User::updateOrCreate(
+            ['username' => 'superadmin'],
+            [
+                'name' => 'Super Administrator',
+                'password' => Hash::make('AdminLabLantai2'),
+                'role' => 'super_admin',
+            ]
+        );
     }
 }
