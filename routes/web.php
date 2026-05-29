@@ -28,19 +28,8 @@ Route::prefix('api')->group(function() {
     Route::get('/bookings', [ApiController::class, 'getBookings']);
     Route::post('/bookings', [ApiController::class, 'storeBooking']);
 
-    // Admin authentication closure middleware
-    $adminAuth = function ($request, $next) {
-        if (!Auth::check()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Unauthorized. Silakan login kembali.'
-            ], 401);
-        }
-        return $next($request);
-    };
-
     // Protected Admin Routes
-    Route::middleware([$adminAuth])->group(function() {
+    Route::middleware([\App\Http\Middleware\AdminAuth::class])->group(function() {
         Route::post('/rooms/{name}', [ApiController::class, 'updateRoom']);
         Route::post('/bookings/{id}', [ApiController::class, 'updateBooking']);
         Route::post('/bookings/{id}/status', [ApiController::class, 'updateBookingStatus']);
